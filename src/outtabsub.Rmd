@@ -1,0 +1,95 @@
+```{r outtabsubfunc, cache=cacheon}
+survmysub <- function(time, event, eventname, xvar, matchdata) {
+  levs <- levels(matchdata %>% pull(!!sym(xvar)))
+
+  out <- data.frame(matrix(NA, ncol = 6, nrow = length(levs) * 2 + 1))
+  colnames(out) <- c("Variable", "Level", "Model", "SGLT2i No", "SGLT2i Yes", "p for interaction")
+  out[1, 1] <- xvar
+
+  out[seq(2, (length(levs) * 2), 2), 3] <- "Incidence"
+  out[seq(3, (length(levs) * 2 + 1), 2), 3] <- "HR (95% CI), p-value"
+
+  for (i in seq_along(levs)) {
+    out[i * 2, 2] <- levs[i]
+
+    ev <- matchdata %>%
+      filter(!!sym(xvar) == levs[i]) %>%
+      group_by(sos_ddr_sglt2) %>%
+      summarise(
+        ev = sum(!!sym(event) == "Yes"),
+        .groups = "drop"
+      )
+    s <- matchdata %>%
+      filter(!!sym(xvar) == levs[i]) %>%
+      group_by(sos_ddr_sglt2) %>%
+      summarise(
+        s = sum(!!sym(time) / 365.25),
+        .groups = "drop"
+      )
+    r <- pois.exact(x = ev$ev, pt = s$s / 100)
+
+    out[i * 2, 4:5] <- paste0(
+      ev$ev, ", ",
+      fn(s$s, dig = 0), ", ",
+      fn(r$rate, dig = 0), " (",
+      fn(r$lower, dig = 0), "-",
+      fn(r$upper, dig = 0), ")"
+    )
+
+    mod <- coxph(formula(paste0(
+      "Surv(", time, ",",
+      event, "=='Yes') ~ sos_ddr_sglt2 * relevel(", xvar, ", ref = '", levs[i],
+      "') + frailty.gaussian(par)"
+    )),
+    data = matchdata
+    )
+    smod <- summary(mod)
+
+    out[i * 2 + 1, 4:5] <- c("ref", paste0(
+      fn(smod$conf.int[1, 1], dig = 2),
+      " (", fn(smod$conf.int[1, 3], dig = 2),
+      "-", fn(smod$conf.int[1, 4], dig = 2), "), ",
+      fn(smod$coef[1, "p"], dig = 3, p = TRUE)
+    ))
+
+
+    if (i == 1) {
+      pint <- last(smod$coef[, "p"])
+
+      out[1, 6] <- fn(pint, dig = 3, p = TRUE)
+    }
+  }
+  return(out)
+}
+```
+
+```{r outtabsub, cache=cacheon, dependson="outtabsubfunc"}
+subout <- survmysub(
+  time = "sos_outtime_hosphf",
+  event = "sos_out_deathcvhosphf",
+  eventname = "CVD/1 HF hosp",
+  xvar = "shf_gfrckdepi_cat",
+  matchdata = matchrsdata %>% filter(!is.na(shf_gfrckdepi_cat))
+)
+subout <- bind_rows(
+  subout,
+  survmysub(
+    time = "sos_outtime_hosphf",
+    event = "sos_out_deathcvhosphf",
+    eventname = "CVD/1 HF hosp",
+    xvar = "shf_diabetestype",
+    matchdata = matchrsdata %>%
+      filter(!is.na(shf_diabetestype) & shf_diabetestype %in% c("No", "Type II")) %>%
+      mutate(shf_diabetestype = droplevels(shf_diabetestype))
+  )
+)
+
+write.xlsx(subout, paste0("./output/tabs/Outcome CVD1HFH Subgroups_", Sys.Date(), ".xlsx"), rowNames = FALSE)
+
+footnote(default_kable(subout,
+  font_size = 6,
+  caption = "Outcome CVD/1 HFH - Subgroups"
+),
+general = c("Incidence =  no events, sum py, rate/100py (95% CI).")
+)
+```

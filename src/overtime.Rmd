@@ -1,0 +1,185 @@
+```{r overtime, fig.cap="SGLT2i overtime"}
+
+cexmy <- 1.2
+# c(bottom, left, top, right) default c(5, 4, 4, 2) + 0.1.
+par(mar = c(6, 4, .5, 2.5) + 0.1)
+
+plot(overtime %>% filter(var == "all") %>% pull(count),
+  overtime %>% filter(var == "all") %>% pull(percent),
+  type = "b",
+  pch = 19,
+  lty = 1,
+  col = global_cols[2],
+  lwd = 2,
+  # cex = 1.5,
+  axes = FALSE,
+  # xaxs = "i",
+  # yaxs = "i",
+  ylim = c(0, 25),
+  # xlim = c(2012 - 0.5, 2018 + 0.5),
+  ylab = "Percent",
+  xlab = "",
+  cex.lab = cexmy
+)
+matplot(overtime %>% filter(var == "dapa") %>% pull(count),
+  overtime %>% filter(var == "dapa") %>% pull(percent),
+  type = "b",
+  pch = 19,
+  lty = 1,
+  col = global_cols[4],
+  lwd = 2,
+  add = T
+)
+matplot(overtime %>% filter(var == "empa") %>% pull(count),
+  overtime %>% filter(var == "empa") %>% pull(percent),
+  type = "b",
+  pch = 19,
+  lty = 1,
+  col = global_cols[6],
+  lwd = 2,
+  add = T
+)
+
+legend(
+  x = 0.5, y = 25, bty = "n", c("SGLT2i", "Dapagliflozin", "Empagliflozin"),
+  col = global_cols[c(2, 4, 6)],
+  cex = cexmy, lwd = 2, lty = 1
+)
+axis(1, overtime %>% filter(var == "all") %>% pull(count),
+  overtime %>% filter(var == "all") %>% pull(yearmonth),
+  cex.axis = cexmy, las = 2
+)
+axis(1,
+  at = mean(c(
+    min(overtime %>% filter(var == "all") %>% pull(count)),
+    max(overtime %>% filter(var == "all") %>% pull(count))
+  )), cex.axis = cexmy,
+  labels = "Year:Month", line = 4, tick = FALSE
+)
+
+axis(2, seq(0, 25, 5), c(seq(0, 20, 5), 100), las = 2, cex.axis = cexmy)
+plotrix::axis.break(2, 22.5, style = "slash")
+```
+
+```{r overtimeckd, fig.cap="SGLT2i overtime by CKD"}
+
+cexmy <- 1.2
+# c(bottom, left, top, right) default c(5, 4, 4, 2) + 0.1.
+par(mar = c(6, 4, .5, 2.5) + 0.1)
+
+plot(overtime %>% filter(var == "ckd") %>% pull(count),
+  overtime %>% filter(var == "ckd") %>% pull(percent),
+  type = "b",
+  pch = 19,
+  lty = 1,
+  col = global_cols[2],
+  lwd = 2,
+  # cex = 1.5,
+  axes = FALSE,
+  # xaxs = "i",
+  # yaxs = "i",
+  ylim = c(0, 25),
+  # xlim = c(2012 - 0.5, 2018 + 0.5),
+  ylab = "Percent",
+  xlab = "",
+  cex.lab = cexmy
+)
+matplot(overtime %>% filter(var == "nockd") %>% pull(count),
+  overtime %>% filter(var == "nockd") %>% pull(percent),
+  type = "b",
+  pch = 19,
+  lty = 1,
+  col = global_cols[4],
+  lwd = 2,
+  add = T
+)
+
+legend(
+  x = 0.5, y = 25, bty = "n", c("eGFR <60", "eGFR \u226560"),
+  col = global_cols[c(2, 4)],
+  cex = cexmy, lwd = 2, lty = 1
+)
+axis(1, overtime %>% filter(var == "all") %>% pull(count),
+  overtime %>% filter(var == "all") %>% pull(yearmonth),
+  cex.axis = cexmy, las = 2
+)
+axis(1,
+  at = mean(c(
+    min(overtime %>% filter(var == "all") %>% pull(count)),
+    max(overtime %>% filter(var == "all") %>% pull(count))
+  )), cex.axis = cexmy,
+  labels = "Year:Month", line = 4, tick = FALSE
+)
+
+axis(2, seq(0, 25, 5), c(seq(0, 20, 5), 100), las = 2, cex.axis = cexmy)
+plotrix::axis.break(2, 22.5, style = "slash")
+```
+
+```{r overtimediabetes, fig.cap="SGLT2i overtime by diabetes (Type I excluded)"}
+
+cexmy <- 1.2
+# c(bottom, left, top, right) default c(5, 4, 4, 2) + 0.1.
+par(mar = c(6, 4, .5, 2.5) + 0.1)
+
+plot(
+  overtime %>% filter(var == "type2") %>% pull(count),
+  overtime %>% filter(var == "type2") %>% pull(percent),
+  type = "b",
+  pch = 19,
+  lty = 1,
+  col = global_cols[2],
+  lwd = 2,
+  # cex = 1.5,
+  axes = FALSE,
+  # xaxs = "i",
+  # yaxs = "i",
+  ylim = c(0, 35),
+  # xlim = c(2012 - 0.5, 2018 + 0.5),
+  ylab = "Percent",
+  xlab = "",
+  cex.lab = cexmy
+)
+matplot(
+  overtime %>% filter(var == "notype2") %>% pull(count),
+  overtime %>% filter(var == "notype2") %>% pull(percent),
+  type = "b",
+  pch = 19,
+  lty = 1,
+  col = global_cols[4],
+  lwd = 2,
+  add = T
+)
+legend(
+  x = 0.5, y = 35, bty = "n", c("Diabetes type II", "No diabetes"),
+  col = global_cols[c(2, 4)],
+  cex = cexmy, lwd = 2, lty = 1
+)
+
+axis(1, overtime %>% filter(var == "all") %>% pull(count),
+  overtime %>% filter(var == "all") %>% pull(yearmonth),
+  cex.axis = cexmy, las = 2
+)
+axis(1,
+  at = mean(c(
+    min(overtime %>% filter(var == "all") %>% pull(count)),
+    max(overtime %>% filter(var == "all") %>% pull(count))
+  )), cex.axis = cexmy,
+  labels = "Year:Month", line = 4, tick = FALSE
+)
+
+axis(2, seq(0, 35, 5), c(seq(0, 30, 5), 100), las = 2, cex.axis = cexmy)
+plotrix::axis.break(2, 32.5, style = "slash")
+```
+
+\clearpage
+
+```{r overtimetab}
+overtimetab <- overtime %>%
+  mutate(percent = fn(percent, 1)) %>%
+  select(var, yearmonth, den, num, percent)
+default_kable(overtimetab,
+  scale_down = FALSE,
+  caption = "SGLT2 overtime (exact percent from Fig)",
+  longtable = TRUE
+)
+```
