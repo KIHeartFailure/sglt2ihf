@@ -1,5 +1,5 @@
 version: 0.10.2
-data_loading: TRUE
+data_loading: FALSE
 data_loading_header: TRUE
 data_ignore:
 cache_loading: TRUE
@@ -9,8 +9,8 @@ logging: FALSE
 logging_level: INFO
 load_libraries: TRUE
 libraries: purrr, dplyr, tidyr, tibble, stringr, lubridate, kableExtra, tableone, 
-                openxlsx, survival, epitools, hfmisc, mice, parallel,
-                doParallel, foreach, Matching, cmprsk, car, EValue, plotrix, lme4, 
+                openxlsx, hfmisc, mice, parallel, miceadds,
+                doParallel, foreach, 
                 DiagrammeR, splines, reda
 as_factors: FALSE
 tables_type: tibble

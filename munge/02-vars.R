@@ -10,13 +10,14 @@ tabvars <- c(
   "sos_ddr_sglt2prevusers",
   
   # demo
-  "shf_indexyearmonth_cat",
+  "shf_indexyearquarter",
   "shf_sex",
   "shf_age",
   "shf_age_cat",
 
   # organizational
   "shf_location",
+  "shf_sos_prevhfh",
   "shf_followuphfunit", "shf_followuplocation_cat",
 
   # clinical factors and lab measurments
@@ -53,10 +54,9 @@ tabvars <- c(
   "shf_device_cat",
 
   # comorbs
-  "shf_smoke",
   "shf_smoke_cat",
   "shf_sos_com_diabetes",
-  "shf_diabetestype",
+  "shf_sos_com_diabetestype",
   "shf_sos_com_hypertension",
   "shf_sos_com_ihd",
   "sos_com_pad",
@@ -68,6 +68,7 @@ tabvars <- c(
   "sos_com_cancer3y",
   "sos_com_copd",
   "sos_com_dialysis",
+  "sos_com_charlsonci_cat",
 
   # socec
   "scb_famtype",
@@ -82,9 +83,10 @@ tabvars_not_in_mod <- c(
   "sos_ddr_sglt2_Empagliflozin",
   "sos_ddr_sglt2prevusers",
   
-  "shf_indexyearmonth_cat",
+  "shf_indexyearquarter",
   
   "shf_age",
+  "shf_location",
   "shf_nyha",
   "shf_bpsys",
   "shf_bpdia",
@@ -95,15 +97,10 @@ tabvars_not_in_mod <- c(
   "shf_ntprobnp",
   "shf_potassium",
   "shf_bmi",
-  "shf_smoke",
   "sos_com_dialysis",
-  "shf_diabetestype"
+  "shf_sos_com_diabetestype",
+  "sos_com_charlsonci_cat"
 )
 
 modvars <- tabvars[!(tabvars %in% tabvars_not_in_mod)]
 modvars <- c(modvars, "shf_indexyearmonth_num")
-
-modvarsstrata <- modvars
-stratavars <- c("shf_location", "shf_ntprobnp_cat", "shf_rasiarni")
-modvarsstrata[modvars %in% stratavars] <-
-  paste0("strata(", stratavars, ")")

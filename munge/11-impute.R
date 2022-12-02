@@ -6,12 +6,6 @@ rsdata <- rsdata %>% select(-shf_bmiimp, -shf_bmiimp_cat)
 
 noimpvars <- names(rsdata)[!names(rsdata) %in% modvars]
 
-# Nelson-Aalen estimator
-na <- basehaz(coxph(Surv(sos_outtime_hosphf, sos_out_deathcvhosphf == "Yes") ~ 1,
-                    data = rsdata, method = "breslow"
-))
-rsdata <- left_join(rsdata, na, by = c("sos_outtime_hosphf" = "time"))
-
 ini <- mice(rsdata, maxit = 0, print = F)
 
 pred <- ini$pred
@@ -59,5 +53,10 @@ stopImplicitCluster()
 datacheck <- mice::complete(imprsdata, 1)
 
 for (i in seq_along(modvars)) {
+  if (any(is.na(datacheck[, modvars[i]]))) stop("Missing for imp vars")
+}
+
+
+for (i in 1:26) {
   if (any(is.na(datacheck[, modvars[i]]))) stop("Missing for imp vars")
 }

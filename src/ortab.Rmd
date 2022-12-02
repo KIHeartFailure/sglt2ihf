@@ -1,10 +1,9 @@
 ```{r ortabfunc, cache=cacheon}
 
 predfunc <- function(sglt2var) {
-  modvarsor <- modvars
-  modvarsor[modvars == "shf_indexyearmonth_num"] <- "shf_indexyearmonth_cat"
+  
   # mult
-  ormod <- with(imprsdata, glm(formula(paste0(sglt2var, "== 'Yes' ~ ", paste(modvarsor, collapse = " + "))),
+  ormod <- with(imprsdata, glm(formula(paste0(sglt2var, "== 'Yes' ~ ", paste(modvars, collapse = " + "))),
     family = binomial(link = "logit")
   ))
 
@@ -29,8 +28,8 @@ predfunc <- function(sglt2var) {
     )
 
   # crude
-  for (i in seq_along(modvarsor)) {
-    ormoduni <- with(imprsdata, glm(formula(paste0(sglt2var, "== 'Yes' ~ ", modvarsor[i])),
+  for (i in seq_along(modvars)) {
+    ormoduni <- with(imprsdata, glm(formula(paste0(sglt2var, "== 'Yes' ~ ", modvars[i])),
       family = binomial(link = "logit")
     ))
 
@@ -82,7 +81,7 @@ predfunc <- function(sglt2var) {
     mutate(Variable = case_when(
       Variable == "shf_sexMale" ~ "Male vs female",
       Variable == "shf_age_cat>=75" ~ "Age (years) >=75 vs < 75",
-      Variable == "shf_locationIn-patient" ~ "In-patient",
+      Variable == "shf_sos_prevhfhPrevious HFH <1 year" ~ "Previous HFH <1 year",
       Variable == "shf_followuplocation_catHospital" ~ "Follow-up hospital vs primary care/other",
       Variable == "shf_ef<30" ~ "EF (%) <30 vs 30-39",
       Variable == "shf_durationhf>6mo" ~ "Duration HF (mo) >=6 vs <6",
@@ -99,8 +98,7 @@ predfunc <- function(sglt2var) {
       Variable == "scb_educationSecondary school" ~ "Secondary vs compulsory school",
       Variable == "scb_educationUniversity" ~ "University vs compulsory school",
       Variable == "scb_dispincome_cat>=median" ~ "Income >=median vs <median",
-      Variable == "shf_indexyearmonth_catMarch-July 2021" ~ "March-July 2021 vs Nov 2020-Feb 2021",
-      Variable == "shf_indexyearmonth_catAug-Dec 2021" ~ "Aug-Dec 2021 vs Nov 2020-Feb 2021",
+      Variable == "shf_indexyearmonth_num" ~ "Index year:month",
       TRUE ~ Variable
     ))
 
@@ -114,14 +112,13 @@ predfunc <- function(sglt2var) {
 
 ```{r orforestfunc, cache=cacheon}
 plotforest <- function(forestdata) {
-  cextext <- 0.9
+  cextext <- 0.8
 
   forestdata <- forestdata %>%
     mutate(
       Variable = str_replace_all(Variable, ">=", "\u2265"),
       Variable = str_replace_all(Variable, "<=", "\u2264")
     ) %>%
-    arrange(logor) %>%
     mutate(
       order = n():1 - 1,
       pnum = as.numeric(p),
@@ -132,7 +129,7 @@ plotforest <- function(forestdata) {
   maxmy <- ceiling(exp(max(forestdata$uci, na.rm = T)))
 
   # c(bottom, left, top, right)
-  par(mar = c(4, 21, 0, 0) + 0.2)
+  par(mar = c(4, 18, 0, 0.5) + 0.2)
 
   gplots::plotCI(
     x = forestdata$logor, y = forestdata$order,
@@ -154,10 +151,10 @@ plotforest <- function(forestdata) {
     col = forestdata$cols,
     lwd = .9,
     gap = 0,
-    sfrac = 0.004
+    sfrac = 0.001
   )
 
-  abline(v = log(1), lty = 2)
+  abline(v = log(1), lty = 3, col = "grey")
 
   axis(1,
     cex.axis = cextext, at = log(c(minmy, 1, maxmy)),
@@ -167,18 +164,18 @@ plotforest <- function(forestdata) {
   axis(2,
     at = forestdata$order,
     labels = forestdata$Variable,
-    cex.axis = cextext, tick = FALSE, las = 2, line = 20, hadj = 0
+    cex.axis = cextext, tick = FALSE, las = 2, line = 17, hadj = 0
   )
 
   axis(2,
     at = nrow(forestdata),
     labels = "Adjusted OR (95% CI)",
-    cex.axis = cextext, tick = FALSE, las = 2, line = 3, hadj = 0.5, font = 2
+    cex.axis = cextext, tick = FALSE, las = 2, line = 2, hadj = 0.5, font = 2
   )
   axis(2,
     at = forestdata$order,
     labels = forestdata$orci,
-    cex.axis = cextext, tick = FALSE, las = 2, line = 3, hadj = 0.5
+    cex.axis = cextext, tick = FALSE, las = 2, line = 2, hadj = 0.5
   )
 
   axis(1,

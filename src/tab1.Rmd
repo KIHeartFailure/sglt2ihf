@@ -18,28 +18,7 @@ tab1 <- as_tibble(cbind(var = rownames(tab1), tab1)) %>%
   select(-test) %>%
   select(var, Missing, everything())
 
-
-tab1m <- print(CreateTableOne(
-  vars = tabvars,
-  strata = "sos_ddr_sglt2",
-  data = matchrsdata
-),
-smd = TRUE,
-missing = TRUE,
-printToggle = FALSE,
-nonnormal = tabvars,
-catDigits = 1,
-contDigits = 1,
-noSpaces = TRUE,
-explain = FALSE
-)
-tab1m <- as_tibble(cbind(var = rownames(tab1m), tab1m)) %>%
-  select(-test) %>%
-  select(var, Missing, everything())
-
-tab1both <- bind_cols(tab1, tab1m %>% select(-var))
-
-tab1both <- tab1both %>%
+tab1 <- tab1 %>%
   # remove = Yes
   mutate(across(everything(), str_replace_all, fixed(" = Yes"), "")) %>%
   # to get labs and units in place
@@ -52,7 +31,7 @@ tab1both <- tab1both %>%
     var_tmp2 = str_replace_all(var_tmp2, "shf_sos_com_", "sos_com_")
   )
 
-tab1both <- left_join(tab1both,
+tab1 <- left_join(tab1,
   meta_variables %>%
     select(variable, label, unit),
   by = c("var_tmp2" = "variable")
@@ -70,10 +49,10 @@ tab1both <- left_join(tab1both,
   )
 
 # footnotes
-tab1both <- tab1both %>%
+tab1 <- tab1 %>%
   mutate(
     footnote1 = if_else(var_tmp %in% modvars, footnote_marker_number(1), ""),
-    footnote2 = if_else(var_tmp == "shf_indexyearmonth_cat", footnote_marker_number(2), "")
+    footnote2 = if_else(var_tmp == "shf_indexyearquarter", footnote_marker_number(2), "")
   ) %>%
   unite(footnote, starts_with("footnote"), sep = "") %>%
   mutate(
@@ -84,27 +63,26 @@ tab1both <- tab1both %>%
     # space in Latex output (fix this other way?)
     Variable = sub("  ", ". ", Variable)
   ) %>%
-  select(Variable, Missing...2:SMD...11)
+  select(Variable, Missing:SMD)
 
 ## fix in order to use escape = TRUE
-colnames(tab1both) <- sanitize_text(c("Variable", rep(c("Missing (%)", "No SGLT2i", "SGLT2i", "p-value", "SMD"), 2)))
+colnames(tab1) <- sanitize_text(c("Variable", rep(c("Missing (%)", "No SGLT2i", "SGLT2i", "p-value", "SMD"), 2)))
 
-write.xlsx(tab1both, paste0("./output/tabs/Baseline characteristics_", Sys.Date(), ".xlsx"), rowNames = FALSE)
+write.xlsx(tab1, paste0("./output/tabs/Baseline characteristics_", Sys.Date(), ".xlsx"), rowNames = FALSE)
 
 footnote(
-  default_kable(tab1both,
+  default_kable(tab1,
     font_size = 6,
     caption = "Baseline characteristics",
     longtable = TRUE,
     escape = FALSE
-  ) %>%
-    add_header_above(c(" " = 1, "All" = 5, "Matched" = 5)),
+  ),
   general = c(
     "Categorical variables are presented with n (%) and tested with chi-square test and continuous variables with median [q1-q3] and tested with Kruskal-Wallis test."
   ),
   number = c(
-    "Included in multiple imputation model and adjusted for in logistic/cox regression models",
-    "Included as a continous variable in imputation and cox regression model and categorical in logistic regression models"
+    "Included in multiple imputation model and adjusted for in logistic regression models",
+    "Included as a continous year:month variable in imputation and logistic regression models"
   )
 )
 ```

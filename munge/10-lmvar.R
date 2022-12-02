@@ -36,16 +36,43 @@ rm(lmtmp2)
 
 # New/prevalent users -----------------------------------------------------
 
-lmtmp2 <- lmtmp %>%
-  mutate(diff = as.numeric(EDATUM - shf_indexdtm)) %>%
-  filter(diff < -30.5 * 5) %>%
-  select(lopnr, shf_indexdtm, EDATUM, ATC)
+lmprevfunc <- function(timestart, timestop, medname) {
+  lmtmp2 <- lmtmp %>%
+    mutate(diff = as.numeric(EDATUM - shf_indexdtm)) %>%
+    filter(diff <= timestart & diff >= timestop) %>%
+    select(lopnr, shf_indexdtm, EDATUM, ATC)
 
-rsdata <- create_medvar(
-  atc = global_sglt2atc,
-  medname = "sglt2prevusers", cohortdata = rsdata, meddata = lmtmp2, id = "lopnr", metatime = "-5mo-14days",
-  valsclass = "fac"
-)
+  rsdata <<- create_medvar(
+    atc = global_sglt2atc,
+    medname = medname, cohortdata = rsdata, meddata = lmtmp2, id = "lopnr", metatime = NA,
+    valsclass = "fac"
+  )
+}
+
+lmprevfunc(timestart = -2 * 365, timestop = -20 * 365, "sglt2prevuser1")
+lmprevfunc(-30.5 * 5 + 1, -2 * 365 - 1, "sglt2prevuser2")
+lmprevfunc(-1, -30.5 * 5, "sglt2prevuser3")
+lmprevfunc(timestart = 14, timestop = 0, "sglt2prevuser4")
+
+rsdata <- rsdata %>%
+  mutate(
+    sos_ddr_sglt2prevusers = factor(case_when(
+      sos_ddr_sglt2prevuser1 == "Yes" ~ 5,
+      sos_ddr_sglt2prevuser2 == "Yes" ~ 4,
+      sos_ddr_sglt2prevuser3 == "Yes" ~ 3,
+      sos_ddr_sglt2prevuser4 == "Yes" ~ 2,
+      TRUE ~ 1
+    ),
+    levels = 1:5, labels = c(
+      "No previous use",
+      "index-14 days",
+      "5m-<index",
+      "5m-2 years",
+      ">= 2 years"
+    )
+    ),
+    sos_ddr_sglt2num = if_else(sos_ddr_sglt2 == "Yes", 1, 0),
+  )
 
 # Overtime graph ----------------------------------------------------------
 
@@ -93,6 +120,13 @@ overtimefunc2 <- function(atc, rspop) {
   overtime <- rbind(overtime, overtimefunc(2021, 10, lmdata = lmovertime, rspop))
   overtime <- rbind(overtime, overtimefunc(2021, 11, lmdata = lmovertime, rspop))
   overtime <- rbind(overtime, overtimefunc(2021, 12, lmdata = lmovertime, rspop))
+  overtime <- rbind(overtime, overtimefunc(2022, 1, lmdata = lmovertime, rspop))
+  overtime <- rbind(overtime, overtimefunc(2022, 2, lmdata = lmovertime, rspop))
+  overtime <- rbind(overtime, overtimefunc(2022, 3, lmdata = lmovertime, rspop))
+  overtime <- rbind(overtime, overtimefunc(2022, 4, lmdata = lmovertime, rspop))
+  overtime <- rbind(overtime, overtimefunc(2022, 5, lmdata = lmovertime, rspop))
+  overtime <- rbind(overtime, overtimefunc(2022, 6, lmdata = lmovertime, rspop))
+  overtime <- rbind(overtime, overtimefunc(2022, 7, lmdata = lmovertime, rspop))
 
   overtime <- overtime %>%
     as.data.frame() %>%
@@ -118,11 +152,20 @@ overtimeckd <- overtimefunc2(
 
 overtimenotype2 <- overtimefunc2(
   atc = global_sglt2atc,
-  rspop = rsdata %>% filter(!is.na(shf_diabetestype) & shf_diabetestype == "No")
+  rspop = rsdata %>% filter(!is.na(shf_sos_com_diabetestype) & shf_sos_com_diabetestype == "No")
 )
 overtimetype2 <- overtimefunc2(
   atc = global_sglt2atc,
-  rspop = rsdata %>% filter(!is.na(shf_diabetestype) & shf_diabetestype == "Type II")
+  rspop = rsdata %>% filter(!is.na(shf_sos_com_diabetestype) & shf_sos_com_diabetestype == "Type II")
+)
+
+overtimenoprevhfh <- overtimefunc2(
+  atc = global_sglt2atc,
+  rspop = rsdata %>% filter(!is.na(shf_sos_prevhfh) & shf_sos_prevhfh == "No previous HFH <1 year")
+)
+overtimeprevhfh <- overtimefunc2(
+  atc = global_sglt2atc,
+  rspop = rsdata %>% filter(!is.na(shf_sos_prevhfh) & shf_sos_prevhfh == "Previous HFH <1 year")
 )
 
 
@@ -133,5 +176,10 @@ overtime <- bind_rows(
   overtimenockd %>% mutate(var = "nockd"),
   overtimeckd %>% mutate(var = "ckd"),
   overtimenotype2 %>% mutate(var = "notype2"),
-  overtimetype2 %>% mutate(var = "type2")
+  overtimetype2 %>% mutate(var = "type2"),
+  overtimenoprevhfh %>% mutate(var = "noprevhfh"),
+  overtimeprevhfh %>% mutate(var = "prevhfh")
 )
+
+metalm <- metalm[1:3, ]
+metalm[, "Register"] <- "Prescribed Drug Register"

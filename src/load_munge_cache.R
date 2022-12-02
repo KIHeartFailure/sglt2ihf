@@ -15,22 +15,9 @@ ProjectTemplate::cache("meta_variables")
 ProjectTemplate::cache("flow")
 ProjectTemplate::cache("rsdata")
 ProjectTemplate::cache("imprsdata")
-ProjectTemplate::cache("matchrsdata")
-
-ProjectTemplate::cache("rsdata_rec")
-ProjectTemplate::cache("matchrsdata_rec")
-
-ProjectTemplate::cache("matchcross_deathcvhosphf")
-ProjectTemplate::cache("matchcross_deathcv")
-ProjectTemplate::cache("matchcross_hosphf")
-ProjectTemplate::cache("matchcross_death")
-ProjectTemplate::cache("matchcross_hosprenal")
 
 ProjectTemplate::cache("metalm")
-ProjectTemplate::cache("matchingn")
 ProjectTemplate::cache("overtime")
 
 ProjectTemplate::cache("tabvars")
 ProjectTemplate::cache("modvars")
-ProjectTemplate::cache("stratavars")
-ProjectTemplate::cache("modvarsstrata")
