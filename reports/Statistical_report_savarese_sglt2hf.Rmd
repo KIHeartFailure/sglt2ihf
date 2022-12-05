@@ -136,6 +136,14 @@ dispension during that year.
 
 \elandscape
 
+The region is "sjukvårdsregion" that the hospital/primary care centre belongs to. 
+
+```{r, child = "./src/regional.Rmd"}
+
+```
+
+\clearpage 
+
 ## Associations with SGLT2i use
 
 Odds ratios are estimated using logistic regression with SGLT2i use as outcome. 

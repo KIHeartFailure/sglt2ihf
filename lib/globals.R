@@ -19,6 +19,8 @@ global_cols <- rev(c(
   "#023647"
 ))
 
+global_colsgreymiss <- "#9d9c9c"
+
 # used for calculation of ci 
 global_z05 <- qnorm(1 - 0.025)
 

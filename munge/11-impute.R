@@ -55,8 +55,3 @@ datacheck <- mice::complete(imprsdata, 1)
 for (i in seq_along(modvars)) {
   if (any(is.na(datacheck[, modvars[i]]))) stop("Missing for imp vars")
 }
-
-
-for (i in 1:26) {
-  if (any(is.na(datacheck[, modvars[i]]))) stop("Missing for imp vars")
-}

@@ -68,13 +68,17 @@ tabvars <- c(
   "sos_com_cancer3y",
   "sos_com_copd",
   "sos_com_dialysis",
+  "sos_com_charlsonci",
   "sos_com_charlsonci_cat",
 
   # socec
   "scb_famtype",
   "scb_child",
   "scb_education",
-  "scb_dispincome_cat"
+  "scb_dispincome_cat", 
+  
+  "shf_qol",
+  "shf_qol_cat"
 )
 
 # vars fox log reg and cox reg
@@ -99,7 +103,11 @@ tabvars_not_in_mod <- c(
   "shf_bmi",
   "sos_com_dialysis",
   "shf_sos_com_diabetestype",
-  "sos_com_charlsonci_cat"
+  "sos_com_charlsonci",
+  "sos_com_charlsonci_cat", 
+  
+  "shf_qol",
+  "shf_qol_cat"
 )
 
 modvars <- tabvars[!(tabvars %in% tabvars_not_in_mod)]

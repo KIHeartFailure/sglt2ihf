@@ -92,6 +92,15 @@ rsdata <- rsdata %>%
       "No previous HFH <1 year",
       "Previous HFH <1 year"
     )
+    ),
+    shf_qol_cat = factor(case_when(
+      shf_qol <= 25 ~ 1,
+      shf_qol <= 50 ~ 2,
+      shf_qol <= 75 ~ 3,
+      shf_qol <= 100 ~ 4,
+    ),
+    levels = 1:4, 
+    labels = c("0-25", "26-50", "51-75", "76-100")
     )
   )
 

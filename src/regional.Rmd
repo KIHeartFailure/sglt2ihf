@@ -1,0 +1,84 @@
+
+```{r reg, cache=cacheon}
+
+swedenmap <- readRDS("./data/swedenmap.rds")
+
+region <- rsdata %>%
+  group_by(shf_centreregion, .drop = FALSE) %>%
+  count(sos_ddr_sglt2, .drop = FALSE) %>%
+  mutate(
+    per = n / sum(n) * 100,
+    ntot = sum(n),
+    np = paste0(n, " (", fn(per, 1), "%)"),
+    np = if_else(ntot < 10, "-", np),
+    per = round(per, 0)
+  ) %>%
+  ungroup() %>%
+  filter(sos_ddr_sglt2 == "Yes") %>%
+  mutate(
+    per_cat = factor(case_when(
+      ntot < 10 ~ 0,
+      per <= 15 ~ 1,
+      per <= 20 ~ 2,
+      per <= 25 ~ 3,
+      per <= 30 ~ 4,
+      per <= 35 ~ 5
+    ),
+    levels = 0:5,
+    labels = c("Not available", "10-15%", "16-20%", "21-25%", "26-30%", "31-35%")
+    )
+  )
+
+if (any(is.na(region$per_cat))) stop("Missing for region, percent outside range")
+
+region <- region %>%
+  mutate(
+    shf_centreregion_mapnr = case_when(
+      shf_centreregion == "Stockholm" ~ 15,
+      shf_centreregion == "Uppsala" ~ 16,
+      shf_centreregion == "Sormland" ~ 14,
+      shf_centreregion == "Ostergotland" ~ 12,
+      shf_centreregion == "Jonkoping" ~ 7,
+      shf_centreregion == "Kronoberg" ~ 9,
+      shf_centreregion == "Kalmar" ~ 8,
+      shf_centreregion == "Gotland" ~ 4,
+      shf_centreregion == "Blekinge" ~ 1,
+      shf_centreregion == "Skane" ~ 13,
+      shf_centreregion == "Halland" ~ 5,
+      shf_centreregion == "Vastra Gotaland" ~ 21,
+      shf_centreregion == "Varmland" ~ 17,
+      shf_centreregion == "Orebro" ~ 11,
+      shf_centreregion == "Vastmanland" ~ 20,
+      shf_centreregion == "Dalarna" ~ 2,
+      shf_centreregion == "Gavleborg" ~ 3,
+      shf_centreregion == "Vasternorrland" ~ 19,
+      shf_centreregion == "Jamtland Harjedalen" ~ 6,
+      shf_centreregion == "Vasterbotten" ~ 18,
+      shf_centreregion == "Norrbotten" ~ 10
+    )
+  )
+
+default_kable(region %>% select(shf_centreregion, np),
+  col.names = c("Region", "N SGLT2i users/N Total (%)"),
+  caption = "Regional distribution of SGLT2i use in Sweden",
+  scale_down = F
+)
+```
+
+```{r regmap, fig.cap="Regional distribution of SGLT2i use in Sweden", cache=cacheon, dependson="reg"}
+
+
+# c(bottom, left, top, right) default c(5, 4, 4, 2) + 0.1.
+par(mar = c(0, 0, 0, 0) + 0.1)
+
+mapcols <- c(global_colsgreymiss, rev(global_cols[2:6]))
+
+mapdata <- region %>%
+  arrange(shf_centreregion_mapnr)
+
+plot(swedenmap, col = mapcols[mapdata$per_cat], border = 0)
+legend("topright",
+  bty = "n", border = mapcols, fill = mapcols,
+  legend = levels(mapdata$per_cat)
+)
+```

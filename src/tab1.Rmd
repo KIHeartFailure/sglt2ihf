@@ -12,38 +12,70 @@ nonnormal = tabvars,
 catDigits = 1,
 contDigits = 1,
 noSpaces = TRUE,
-explain = FALSE
+explain = FALSE,
+showAllLevels = TRUE
 )
 tab1 <- as_tibble(cbind(var = rownames(tab1), tab1)) %>%
   select(-test) %>%
-  select(var, Missing, everything())
+  select(var, level, Missing, everything())
+
+
+percenttab <- tibble(var_2 = NA, level_2 = NA, No_2 = NA, Yes_2 = NA)
+for (i in seq_along(tabvars)) {
+  if (class(rsdata %>% pull(tabvars[i])) == "factor") {
+    tab1percent <- rsdata %>%
+      filter(!is.na(!!sym(tabvars[i]))) %>%
+      group_by(!!sym(tabvars[i]), .drop = F) %>%
+      count(sos_ddr_sglt2, .drop = F) %>%
+      mutate(
+        per = fn(n / sum(n) * 100, 1),
+        np = paste0(n, " (", per, ")")
+      ) %>%
+      ungroup() %>%
+      select(-n, -per) %>%
+      pivot_wider(id_cols = tabvars[i], names_from = sos_ddr_sglt2, values_from = np) %>%
+      mutate(
+        level = !!sym(tabvars[i]),
+        count = 1:n()
+      ) %>%
+      mutate(var = if_else(count == 1, tabvars[i], NA_character_)) %>%
+      select(var, level, No, Yes)
+  } else {
+    tab1percent <- tibble(var = tabvars[i], level = NA_character_, No = NA_character_, Yes = NA_character_)
+  }
+  colnames(tab1percent) <- paste0(colnames(tab1percent), "_2")
+  percenttab <- bind_rows(percenttab, tab1percent)
+}
+
+tab1 <- bind_cols(tab1, percenttab)
+
+tab1koll <- tab1 %>%
+  mutate(
+    varkoll = var == var_2,
+    levelkoll = level == level_2
+  )
+if (any(!tab1koll$varkoll, na.rm = T) | any(!tab1koll$levelkoll, na.rm = T)) stop("Missmatch for tab 1")
 
 tab1 <- tab1 %>%
-  # remove = Yes
-  mutate(across(everything(), str_replace_all, fixed(" = Yes"), "")) %>%
-  # to get labs and units in place
+  select(-var_2, -level_2)
+
+tab1 <- tab1 %>%
   mutate(
-    var_tmp = str_split(var, " = ", simplify = TRUE)[, 1],
-    val_tmp = str_split(var, " = ", simplify = TRUE)[, 2],
-    # if recoding or categorizing will still get org label
-    var_tmp2 = str_replace_all(var_tmp, "(_cat2|_cat)", ""),
+   # if shf/sos combination  will still get org label
+    var_tmp = str_replace_all(var, "(_cat2|_cat)", ""),
     # if shf/sos combination  will still get org label
-    var_tmp2 = str_replace_all(var_tmp2, "shf_sos_com_", "sos_com_")
+    var_tmp = str_replace_all(var_tmp, "shf_sos_com_", "sos_com_")
   )
 
 tab1 <- left_join(tab1,
   meta_variables %>%
     select(variable, label, unit),
-  by = c("var_tmp2" = "variable")
+  by = c("var_tmp" = "variable")
 ) %>%
   mutate(
-    Variable = coalesce(label, var_tmp),
+    Variable = coalesce(label, var),
     Variable = if_else(!is.na(unit),
       paste0(Variable, " (", unit, ")"),
-      Variable
-    ),
-    Variable = if_else(val_tmp != "",
-      paste0(Variable, " ", val_tmp),
       Variable
     )
   )
@@ -51,8 +83,8 @@ tab1 <- left_join(tab1,
 # footnotes
 tab1 <- tab1 %>%
   mutate(
-    footnote1 = if_else(var_tmp %in% modvars, footnote_marker_number(1), ""),
-    footnote2 = if_else(var_tmp == "shf_indexyearquarter", footnote_marker_number(2), "")
+    footnote1 = if_else(var %in% modvars, footnote_marker_number(1), ""),
+    footnote2 = if_else(var == "shf_indexyearquarter", footnote_marker_number(2), "")
   ) %>%
   unite(footnote, starts_with("footnote"), sep = "") %>%
   mutate(
@@ -63,10 +95,11 @@ tab1 <- tab1 %>%
     # space in Latex output (fix this other way?)
     Variable = sub("  ", ". ", Variable)
   ) %>%
-  select(Variable, Missing:SMD)
+  select(Variable, level, Missing, No, Yes, No_2, Yes_2, p, SMD)
 
 ## fix in order to use escape = TRUE
-colnames(tab1) <- sanitize_text(c("Variable", rep(c("Missing (%)", "No SGLT2i", "SGLT2i", "p-value", "SMD"), 2)))
+colnames(tab1) <- sanitize_text(
+  c("Variable", "Level", "Missing (%)", rep(c("No SGLT2i", "SGLT2i"), 2), "p-value", "SMD"))
 
 write.xlsx(tab1, paste0("./output/tabs/Baseline characteristics_", Sys.Date(), ".xlsx"), rowNames = FALSE)
 
@@ -76,7 +109,8 @@ footnote(
     caption = "Baseline characteristics",
     longtable = TRUE,
     escape = FALSE
-  ),
+  ) %>%
+    add_header_above(c(" " = 1, " " = 1, " " = 1, "Column percent (normal)" = 2, "Row percent" = 2, " " = 1, " " = 1)),
   general = c(
     "Categorical variables are presented with n (%) and tested with chi-square test and continuous variables with median [q1-q3] and tested with Kruskal-Wallis test."
   ),
