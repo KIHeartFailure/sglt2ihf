@@ -1,0 +1,75 @@
+```{r tab1rowpercent, cache=cacheon}
+
+percenttab <- tibble(var = NA, level = NA, No = NA, Yes = NA)
+for (i in seq_along(tabvars)) {
+  if (class(rsdata %>% pull(tabvars[i])) == "factor") {
+    tab1percent <- rsdata %>%
+      filter(!is.na(!!sym(tabvars[i]))) %>%
+      group_by(!!sym(tabvars[i]), .drop = F) %>%
+      count(sos_ddr_sglt2, .drop = F) %>%
+      mutate(
+        per = fn(n / sum(n) * 100, 1),
+        np = paste0(n, " (", per, ")")
+      ) %>%
+      ungroup() %>%
+      select(-n, -per) %>%
+      pivot_wider(id_cols = tabvars[i], names_from = sos_ddr_sglt2, values_from = np) %>%
+      mutate(
+        level = !!sym(tabvars[i]),
+        count = 1:n()
+      ) %>%
+      mutate(var = if_else(count == 1, tabvars[i], NA_character_)) %>%
+      select(var, level, No, Yes)
+  } else {
+    tab1percent <- tibble(var = tabvars[i], level = NA, No = NA, Yes = NA)
+  }
+  percenttab <- bind_rows(percenttab, tab1percent)
+}
+
+percenttab <- percenttab %>% filter(!is.na(level))
+
+percenttab <- percenttab %>%
+  mutate(
+    # if shf/sos combination  will still get org label
+    var_tmp = str_replace_all(var, "(_cat2|_cat)", ""),
+    # if shf/sos combination  will still get org label
+    var_tmp = str_replace_all(var_tmp, "shf_sos_com_", "shf_")
+  )
+
+percenttab <- left_join(percenttab,
+  meta_variables %>%
+    select(variable, label, unit),
+  by = c("var_tmp" = "variable")
+) %>%
+  mutate(
+    Variable = coalesce(label, var),
+    Variable = if_else(!is.na(unit),
+      paste0(Variable, " (", unit, ")"),
+      Variable
+    )
+  )
+
+# footnotes
+percenttab <- percenttab %>%
+  mutate(
+    # so no probs
+    Variable = sanitize_text(Variable),
+    # space in Latex output (fix this other way?)
+    Variable = sub("  ", ". ", Variable)
+  ) %>%
+  select(Variable, level, No, Yes)
+
+## fix in order to use escape = TRUE
+colnames(percenttab) <- sanitize_text(
+  c("Variable", "Level", "No SGLT2i", "SGLT2i")
+)
+
+write.xlsx(tab1, paste0("./output/tabs/Baseline characteristics_rowpercent", Sys.Date(), ".xlsx"), rowNames = FALSE)
+
+default_kable(percenttab,
+  font_size = 6,
+  caption = "Baseline characteristics - Row percent",
+  longtable = TRUE,
+  escape = FALSE
+)
+```

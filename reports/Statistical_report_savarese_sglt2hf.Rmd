@@ -126,15 +126,17 @@ dispension during that year.
 
 \clearpage
 
-\blandscape
-
 ## Baseline characteristics
 
 ```{r, child = "./src/tab1.Rmd"}
 
 ```
 
-\elandscape
+```{r, child = "./src/tab1_rowpercent.Rmd"}
+
+```
+
+\clearpage 
 
 The region is "sjukvårdsregion" that the hospital/primary care centre belongs to. 
 
