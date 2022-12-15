@@ -43,7 +43,7 @@ predfunc <- function(impdata, var, novar = var) {
         lciadj = sormodadj$estimate[2:nlevsivar] - global_z05 * sormodadj$std.error[2:nlevsivar],
         uciadj = sormodadj$estimate[2:nlevsivar] + global_z05 * sormodadj$std.error[2:nlevsivar],
         padj = fn(sormodadj$p.value[2:nlevsivar], dig = 3, p = TRUE),
-        pintadj = fn(last(sormodadj$p.value), dig = 3, p = TRUE),
+        pintadj = fn(last(sormodadj$p.value), dig = 3, p = TRUE)
       ) %>%
         mutate(
           orcicrude = paste0(

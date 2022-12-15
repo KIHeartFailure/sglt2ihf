@@ -20,47 +20,49 @@ save(
   list = c("rsdata", "flow")
 )
 
+# run 07
 
-# run 07-08
+ProjectTemplate::reload.project()
+load(file = "./data/tmprsdata1.RData")
+load(paste0(datapath, "/rawData_sossv.RData"))
+
+load(paste0(datapath, "/rawData_sosov.RData"))
+
+source("./munge/07-prep_nprdata.R")
+
+save(file = paste0("./data/patreg.RData"), list = c("patreg"))
+
+# run 08-09
 ProjectTemplate::reload.project()
 
 load(file = "./data/tmprsdata1.RData")
-load(paste0(datapath, "patregrsdata.RData"))
+load(paste0("./data/patreg.RData"))
 
-source("./munge/07-outcom_sos.R")
-source("./munge/08-charlsoncomorbindex_sos.R")
+source("./munge/08-outcom_sos.R")
+source("./munge/09-charlsoncomorbindex_sos.R")
 
-# run 09
-source("./munge/09-recat.R")
+# run 10
+source("./munge/10-recat.R")
 
 save(
   file = "./data/tmprsdata2.RData",
   list = c("rsdata", "flow", "outcommeta", "ccimeta")
 )
 
-# run 10
+# run 11
 ProjectTemplate::reload.project()
 
 load("./data/tmprsdata2.RData")
-load(paste0(datapath, "lmswedehf.RData"))
+load("./data/lmsglt2.RData")
 
-lmsel <- lmswedehf %>%
-  mutate(atcneed = stringr::str_detect(ATC, "^A10")) %>%
-  filter(
-    ANTAL >= 0,
-    atcneed
-  )
-
-rm(lmswedehf)
-
-source("./munge/10-lmvar.R")
+source("./munge/11-lmvar.R")
 
 save(
   file = "./data/tmprsdata3.RData",
   list = c("rsdata", "flow", "outcommeta", "ccimeta", "metalm", "overtime")
 )
 
-# run 02, 11
+# run 02, 12
 ProjectTemplate::reload.project(
   reset = TRUE,
   data_loading = FALSE,
@@ -74,7 +76,7 @@ meta_variables <- read.xlsx("C:/Users/Lina/STATISTIK/Projects/20210525_shfdb4/dm
 load("./data/tmprsdata3.RData")
 
 source("./munge/02-vars.R")
-source("./munge/11-impute.R")
+source("./munge/12-impute.R")
 
 
 # save

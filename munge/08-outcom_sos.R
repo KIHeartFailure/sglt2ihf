@@ -3,7 +3,7 @@
 # Comorbidities -----------------------------------------------------------
 
 rsdata <- create_sosvar(
-  sosdata = patregrsdata,
+  sosdata = patreg,
   cohortdata = rsdata,
   patid = lopnr,
   indexdate = shf_indexdtm,
@@ -17,7 +17,7 @@ rsdata <- create_sosvar(
   warnings = FALSE
 )
 rsdata <- create_sosvar(
-  sosdata = patregrsdata,
+  sosdata = patreg,
   cohortdata = rsdata,
   patid = lopnr,
   indexdate = shf_indexdtm,
@@ -31,7 +31,7 @@ rsdata <- create_sosvar(
   warnings = FALSE
 )
 rsdata <- create_sosvar(
-  sosdata = patregrsdata,
+  sosdata = patreg,
   cohortdata = rsdata,
   patid = lopnr,
   indexdate = shf_indexdtm,
@@ -45,7 +45,7 @@ rsdata <- create_sosvar(
   warnings = FALSE
 )
 rsdata <- create_sosvar(
-  sosdata = patregrsdata,
+  sosdata = patreg,
   cohortdata = rsdata,
   patid = lopnr,
   indexdate = shf_indexdtm,
@@ -59,7 +59,7 @@ rsdata <- create_sosvar(
   warnings = FALSE
 )
 rsdata <- create_sosvar(
-  sosdata = patregrsdata,
+  sosdata = patreg,
   cohortdata = rsdata,
   patid = lopnr,
   indexdate = shf_indexdtm,
@@ -75,7 +75,7 @@ rsdata <- create_sosvar(
   warnings = FALSE
 )
 rsdata <- create_sosvar(
-  sosdata = patregrsdata,
+  sosdata = patreg,
   cohortdata = rsdata,
   patid = lopnr,
   indexdate = shf_indexdtm,
@@ -89,7 +89,7 @@ rsdata <- create_sosvar(
   warnings = FALSE
 )
 rsdata <- create_sosvar(
-  sosdata = patregrsdata,
+  sosdata = patreg,
   cohortdata = rsdata,
   patid = lopnr,
   indexdate = shf_indexdtm,
@@ -103,7 +103,7 @@ rsdata <- create_sosvar(
   warnings = FALSE
 )
 rsdata <- create_sosvar(
-  sosdata = patregrsdata,
+  sosdata = patreg,
   cohortdata = rsdata,
   patid = lopnr,
   indexdate = shf_indexdtm,
@@ -117,7 +117,7 @@ rsdata <- create_sosvar(
   warnings = FALSE
 )
 rsdata <- create_sosvar(
-  sosdata = patregrsdata,
+  sosdata = patreg,
   cohortdata = rsdata,
   patid = lopnr,
   indexdate = shf_indexdtm,
@@ -131,7 +131,7 @@ rsdata <- create_sosvar(
   warnings = FALSE
 )
 rsdata <- create_sosvar(
-  sosdata = patregrsdata,
+  sosdata = patreg,
   cohortdata = rsdata,
   patid = lopnr,
   indexdate = shf_indexdtm,
@@ -147,7 +147,7 @@ rsdata <- create_sosvar(
   warnings = FALSE
 )
 rsdata <- create_sosvar(
-  sosdata = patregrsdata,
+  sosdata = patreg,
   cohortdata = rsdata,
   patid = lopnr,
   indexdate = shf_indexdtm,
@@ -161,7 +161,7 @@ rsdata <- create_sosvar(
   warnings = FALSE
 )
 rsdata <- create_sosvar(
-  sosdata = patregrsdata,
+  sosdata = patreg,
   cohortdata = rsdata,
   patid = lopnr,
   indexdate = shf_indexdtm,
@@ -175,7 +175,7 @@ rsdata <- create_sosvar(
   warnings = FALSE
 )
 rsdata <- create_sosvar(
-  sosdata = patregrsdata,
+  sosdata = patreg,
   cohortdata = rsdata,
   patid = lopnr,
   indexdate = shf_indexdtm,
@@ -194,7 +194,7 @@ rm(metaout)
 
 # Time since last HF hospitalization --------------------------------------
 
-hfhospsos <- patregrsdata %>%
+hfhospsos <- patreg %>%
   filter(sos_source == "sv") %>%
   mutate(tmp_hfhospsos = stringr::str_detect(HDIA, global_hficd)) %>%
   filter(tmp_hfhospsos)

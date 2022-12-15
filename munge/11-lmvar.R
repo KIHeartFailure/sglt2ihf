@@ -6,8 +6,8 @@
 lmtmp <- left_join(
   rsdata %>%
     select(lopnr, shf_indexdtm),
-  lmsel,
-  by = "lopnr"
+  lmsglt2,
+  by = c("lopnr" = "LopNr")
 )
 
 lmtmp2 <- lmtmp %>%
@@ -31,6 +31,26 @@ rsdata <- create_medvar(
   valsclass = "fac"
 )
 
+rsdata <- create_medvar(
+  atc = "^(A10BK02|A10BD16)",
+  medname = "sglt2_Canagliflozin", cohortdata = rsdata, meddata = lmtmp2, id = "lopnr", metatime = "-5mo-14days",
+  valsclass = "fac"
+)
+rsdata <- create_medvar(
+  atc = "^(A10BK04|A10BD23|A10BD24)",
+  medname = "sglt2_Ertugliflozin", cohortdata = rsdata, meddata = lmtmp2, id = "lopnr", metatime = "-5mo-14days",
+  valsclass = "fac"
+)
+rsdata <- create_medvar(
+  atc = "^A10BK05",
+  medname = "sglt2_Ipragliflozin", cohortdata = rsdata, meddata = lmtmp2, id = "lopnr", metatime = "-5mo-14days",
+  valsclass = "fac"
+)
+rsdata <- create_medvar(
+  atc = "^A10BK06",
+  medname = "sglt2_Sotagliflozin", cohortdata = rsdata, meddata = lmtmp2, id = "lopnr", metatime = "-5mo-14days",
+  valsclass = "fac"
+)
 
 rm(lmtmp2)
 
@@ -181,5 +201,5 @@ overtime <- bind_rows(
   overtimeprevhfh %>% mutate(var = "prevhfh")
 )
 
-metalm <- metalm[1:3, ]
+metalm <- metalm[1:7, ]
 metalm[, "Register"] <- "Prescribed Drug Register"

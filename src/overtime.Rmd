@@ -15,7 +15,7 @@ plot(overtime %>% filter(var == "all") %>% pull(count),
   axes = FALSE,
   # xaxs = "i",
   # yaxs = "i",
-  ylim = c(0, 25),
+  ylim = c(0, 40),
   # xlim = c(2012 - 0.5, 2018 + 0.5),
   ylab = "Percent",
   xlab = "",
@@ -41,7 +41,7 @@ matplot(overtime %>% filter(var == "empa") %>% pull(count),
 )
 
 legend(
-  x = 0.5, y = 25, bty = "n", c("SGLT2i", "Dapagliflozin", "Empagliflozin"),
+  x = 0.5, y = 40, bty = "n", c("SGLT2i", "Dapagliflozin", "Empagliflozin"),
   col = global_cols[c(2, 4, 6)],
   cex = cexmy, lwd = 2, lty = 1
 )
@@ -57,8 +57,8 @@ axis(1,
   labels = "Year:Month", line = 4, tick = FALSE
 )
 
-axis(2, seq(0, 25, 5), c(seq(0, 20, 5), 100), las = 2, cex.axis = cexmy)
-plotrix::axis.break(2, 22.5, style = "slash")
+axis(2, seq(0, 40, 5), c(seq(0, 35, 5), 100), las = 2, cex.axis = cexmy)
+plotrix::axis.break(2, 37.5, style = "slash")
 ```
 
 ```{r overtimeckd, fig.cap="SGLT2i overtime by CKD", cache=cacheon}
@@ -78,7 +78,7 @@ plot(overtime %>% filter(var == "ckd") %>% pull(count),
   axes = FALSE,
   # xaxs = "i",
   # yaxs = "i",
-  ylim = c(0, 25),
+  ylim = c(0, 40),
   # xlim = c(2012 - 0.5, 2018 + 0.5),
   ylab = "Percent",
   xlab = "",
@@ -95,7 +95,7 @@ matplot(overtime %>% filter(var == "nockd") %>% pull(count),
 )
 
 legend(
-  x = 0.5, y = 25, bty = "n", c("eGFR <60", "eGFR \u226560"),
+  x = 0.5, y = 40, bty = "n", c("eGFR <60", "eGFR \u226560"),
   col = global_cols[c(2, 4)],
   cex = cexmy, lwd = 2, lty = 1
 )
@@ -111,8 +111,8 @@ axis(1,
   labels = "Year:Month", line = 4, tick = FALSE
 )
 
-axis(2, seq(0, 25, 5), c(seq(0, 20, 5), 100), las = 2, cex.axis = cexmy)
-plotrix::axis.break(2, 22.5, style = "slash")
+axis(2, seq(0, 40, 5), c(seq(0, 35, 5), 100), las = 2, cex.axis = cexmy)
+plotrix::axis.break(2, 37.5, style = "slash")
 ```
 
 ```{r overtimediabetes, fig.cap="SGLT2i overtime by diabetes (Type I excluded)", cache=cacheon}
@@ -133,7 +133,7 @@ plot(
   axes = FALSE,
   # xaxs = "i",
   # yaxs = "i",
-  ylim = c(0, 35),
+  ylim = c(0, 40),
   # xlim = c(2012 - 0.5, 2018 + 0.5),
   ylab = "Percent",
   xlab = "",
@@ -150,7 +150,7 @@ matplot(
   add = T
 )
 legend(
-  x = 0.5, y = 35, bty = "n", c("Diabetes type II", "No diabetes"),
+  x = 0.5, y = 40, bty = "n", c("Diabetes type II", "No diabetes"),
   col = global_cols[c(2, 4)],
   cex = cexmy, lwd = 2, lty = 1
 )
@@ -167,8 +167,8 @@ axis(1,
   labels = "Year:Month", line = 4, tick = FALSE
 )
 
-axis(2, seq(0, 35, 5), c(seq(0, 30, 5), 100), las = 2, cex.axis = cexmy)
-plotrix::axis.break(2, 32.5, style = "slash")
+axis(2, seq(0, 40, 5), c(seq(0, 35, 5), 100), las = 2, cex.axis = cexmy)
+plotrix::axis.break(2, 37.5, style = "slash")
 ```
 
 \clearpage
@@ -191,7 +191,7 @@ plot(
   axes = FALSE,
   # xaxs = "i",
   # yaxs = "i",
-  ylim = c(0, 35),
+  ylim = c(0, 40),
   # xlim = c(2012 - 0.5, 2018 + 0.5),
   ylab = "Percent",
   xlab = "",
@@ -208,7 +208,7 @@ matplot(
   add = T
 )
 legend(
-  x = 0.5, y = 35, bty = "n", c("Previous HFH <1 year", "No previous HFH <1 year"),
+  x = 0.5, y = 40, bty = "n", c("Previous HFH <1 year", "No previous HFH <1 year"),
   col = global_cols[c(2, 4)],
   cex = cexmy, lwd = 2, lty = 1
 )
@@ -225,8 +225,8 @@ axis(1,
   labels = "Year:Month", line = 4, tick = FALSE
 )
 
-axis(2, seq(0, 35, 5), c(seq(0, 30, 5), 100), las = 2, cex.axis = cexmy)
-plotrix::axis.break(2, 32.5, style = "slash")
+axis(2, seq(0, 40, 5), c(seq(0, 35, 5), 100), las = 2, cex.axis = cexmy)
+plotrix::axis.break(2, 37.5, style = "slash")
 ```
 
 \clearpage

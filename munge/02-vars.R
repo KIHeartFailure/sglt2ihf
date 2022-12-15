@@ -8,6 +8,10 @@ tabvars <- c(
   "sos_ddr_sglt2_Dapagliflozin",
   "sos_ddr_sglt2_Empagliflozin",
   "sos_ddr_sglt2prevusers",
+  "sos_ddr_sglt2_Canagliflozin",
+  "sos_ddr_sglt2_Ertugliflozin", 
+  "sos_ddr_sglt2_Ipragliflozin", 
+  "sos_ddr_sglt2_Sotagliflozin",
   
   # demo
   "shf_indexyearquarter",
@@ -86,6 +90,10 @@ tabvars_not_in_mod <- c(
   "sos_ddr_sglt2_Dapagliflozin",
   "sos_ddr_sglt2_Empagliflozin",
   "sos_ddr_sglt2prevusers",
+  "sos_ddr_sglt2_Canagliflozin",
+  "sos_ddr_sglt2_Ertugliflozin", 
+  "sos_ddr_sglt2_Ipragliflozin", 
+  "sos_ddr_sglt2_Sotagliflozin",
   
   "shf_indexyearquarter",
   
