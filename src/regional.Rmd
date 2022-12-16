@@ -18,7 +18,7 @@ region <- rsdata %>%
   mutate(
     per_cat = factor(case_when(
       ntot < 10 ~ 0,
-      per <= 20 ~ 1,
+      per >= 10 & per <= 20 ~ 1,
       per <= 30 ~ 2,
       per <= 40 ~ 3,
       per <= 50 ~ 4
@@ -65,7 +65,6 @@ default_kable(region %>% select(shf_centreregion, np),
 ```
 
 ```{r regmap, fig.cap="Regional distribution of SGLT2i use in Sweden", cache=cacheon, dependson="reg"}
-
 
 # c(bottom, left, top, right) default c(5, 4, 4, 2) + 0.1.
 par(mar = c(0, 0, 0, 0) + 0.1)

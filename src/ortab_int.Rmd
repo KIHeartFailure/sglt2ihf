@@ -1,6 +1,6 @@
 ```{r ortabintfunc, cache=cacheon}
 
-predfunc <- function(impdata, var, novar = var) {
+predfunc <- function(impdata = imprsdata, var, novar = var) {
   modvarstmp <- modvars[modvars != var]
   modvarstmp <- modvarstmp[modvarstmp != novar]
   levs <- levels(rsdata %>% pull(!!sym(var)))
@@ -29,7 +29,6 @@ predfunc <- function(impdata, var, novar = var) {
       )),
       family = binomial(link = "logit")
       ))
-
       sormodadj <- summary(pool(ormodadj))
 
       predstmp <- bind_cols(
@@ -152,14 +151,14 @@ plotforest <- function(forestdata, levs, add1) {
   maxmy <- ceiling(exp(max(c(forestdata$uciadj_1, forestdata$uciadj_2), na.rm = T)))
 
   # c(bottom, left, top, right)
-  par(mar = c(3, 18.5, 0, 0) + 0.2)
+  par(mar = c(3, 18, 0, 0) + 0.2)
 
   gplots::plotCI(
     x = forestdata$logoradj_1, y = forestdata$order,
     li = forestdata$lciadj_1,
     ui = forestdata$uciadj_1,
     err = "x",
-    cex = 0.7,
+    cex = 0.6,
     xlim = c(
       log(minmy),
       log(maxmy) + add1
@@ -172,7 +171,7 @@ plotforest <- function(forestdata, levs, add1) {
     pch = 22,
     pt.bg = forestdata$cols_1,
     col = forestdata$cols_1,
-    lwd = .9,
+    lwd = .8,
     gap = 0,
     sfrac = 0.001
   )
@@ -184,11 +183,11 @@ plotforest <- function(forestdata, levs, add1) {
     li = forestdata$lciadj_2 + add1,
     ui = forestdata$uciadj_2 + add1,
     err = "x",
-    cex = 0.7,
+    cex = 0.6,
     pch = 22,
     pt.bg = forestdata$cols_2,
     col = forestdata$cols_2,
-    lwd = .9,
+    lwd = .8,
     gap = 0,
     sfrac = 0.001
   )
@@ -208,34 +207,34 @@ plotforest <- function(forestdata, levs, add1) {
   axis(2,
     at = forestdata$order,
     labels = forestdata$Variable,
-    cex.axis = cextext, tick = FALSE, las = 2, line = 17.5, hadj = 0
+    cex.axis = cextext, tick = FALSE, las = 2, line = 17, hadj = 0
   )
 
   axis(2,
     at = nrow(forestdata),
     labels = levs[1],
-    cex.axis = cextext, tick = FALSE, las = 2, line = 6, hadj = 0.5, font = 2
+    cex.axis = cextext, tick = FALSE, las = 2, line = 5.5, hadj = 0.5, font = 2
   )
   axis(2,
     at = forestdata$order,
     labels = forestdata$orciadj_1,
-    cex.axis = cextext, tick = FALSE, las = 2, line = 6, hadj = 0.5
+    cex.axis = cextext, tick = FALSE, las = 2, line = 5.5, hadj = 0.5
   )
   axis(2,
     at = nrow(forestdata),
     labels = levs[2],
-    cex.axis = cextext, tick = FALSE, las = 2, line = 1.5, hadj = 0.5, font = 2
+    cex.axis = cextext, tick = FALSE, las = 2, line = 1, hadj = 0.5, font = 2
   )
   axis(2,
     at = forestdata$order,
     labels = forestdata$orciadj_2,
-    cex.axis = cextext, tick = FALSE, las = 2, line = 1.5, hadj = 0.5
+    cex.axis = cextext, tick = FALSE, las = 2, line = 1, hadj = 0.5
   )
 
   axis(2,
     at = nrow(forestdata) + 1,
     labels = "Adjusted OR (95% CI)",
-    cex.axis = cextext, tick = FALSE, las = 2, line = (6 + 1.5)/ 2, hadj = 0.5, font = 2
+    cex.axis = cextext, tick = FALSE, las = 2, line = (5.5 + 1)/ 2, hadj = 0.5, font = 2
   )
 
   axis(1,
@@ -245,11 +244,11 @@ plotforest <- function(forestdata, levs, add1) {
 }
 ```
 
+\blandscape
+
 ```{r ortabgfr, dependson="ortabintfunc", cache=cacheon}
 
-impegfr <- miceadds::subset_datlist(imprsdata, expr_subset = !is.na(rsdata$shf_gfrckdepi_cat))
 predall <- predfunc(
-  impdata = impegfr,
   var = "shf_gfrckdepi_cat"
 )
 
@@ -257,7 +256,7 @@ colnames(predall$predsprint) <- c(
   "Variable",
   rep(c(
     rep(c("OR (95% CI)", "p-value"), 2),
-    "p-value int"
+    "p-value interaction"
   ), 2)
 )
 
@@ -280,15 +279,17 @@ default_kable(predall$predsprint,
   add_header_above(c(" " = 1, "Crude" = 5, "Adjusted" = 5))
 ```
 
-```{r orforestgfradj, cache=cacheon, dependson=c("ortabintfunc", "ortabgfr", "orforestintfunc"), fig.width=5, fig.height=10, fig.cap="Adjusted associations between SGLT2i use and characteristics in GFR subgroups"}
+\elandscape
+
+```{r orforestgfradj, cache=cacheon, dependson=c("ortabintfunc", "ortabgfr", "orforestintfunc"), fig.width=6, fig.height=10, fig.cap="Adjusted associations between SGLT2i use and characteristics in GFR subgroups"}
 
 predadj <- predall$preds %>%
   select(Variable, contains("adj"))
 
-plotforest(forestdata = predadj, levs = levs, add1 = 3.5)
+plotforest(forestdata = predadj, levs = levs, add1 = 3)
 ```
 
-\clearpage
+\blandscape
 
 ```{r ortabdiabetes, dependson="ortabintfunc", cache=cacheon}
 
@@ -303,7 +304,7 @@ colnames(predall$predsprint) <- c(
   "Variable",
   rep(c(
     rep(c("OR (95% CI)", "p-value"), 2),
-    "p-value int"
+    "p-value interaction"
   ), 2)
 )
 
@@ -327,7 +328,9 @@ default_kable(predall$predsprint,
   add_header_above(c(" " = 1, "Crude" = 5, "Adjusted" = 5))
 ```
 
-```{r orforestdiabetesadj, cache=cacheon, dependson=c("ortabintfunc", "ortabdiabetes", "orforestintfunc"), fig.width=5, fig.height=10, fig.cap="Adjusted associations between SGLT2i use and characteristics in diabetes subgroups (Type I excluded)"}
+\elandscape
+
+```{r orforestdiabetesadj, cache=cacheon, dependson=c("ortabintfunc", "ortabdiabetes", "orforestintfunc"), fig.width=6, fig.height=10, fig.cap="Adjusted associations between SGLT2i use and characteristics in diabetes subgroups (Type I excluded)"}
 
 predadj <- predall$preds %>%
   select(Variable, contains("adj"))
@@ -335,13 +338,11 @@ predadj <- predall$preds %>%
 plotforest(forestdata = predadj, levs = levs, add1 = 4)
 ```
 
-\clearpage
+\blandscape
 
 ```{r ortabprevhfh, dependson="ortabintfunc", cache=cacheon}
 
-impdia <- miceadds::subset_datlist(imprsdata, expr_subset = !is.na(rsdata$shf_sos_prevhfh))
 predall <- predfunc(
-  impdata = impdia,
   var = "shf_sos_prevhfh"
 )
 
@@ -349,7 +350,7 @@ colnames(predall$predsprint) <- c(
   "Variable",
   rep(c(
     rep(c("OR (95% CI)", "p-value"), 2),
-    "p-value int"
+    "p-value interaction"
   ), 2)
 )
 
@@ -373,10 +374,12 @@ default_kable(predall$predsprint,
   add_header_above(c(" " = 1, "Crude" = 5, "Adjusted" = 5))
 ```
 
-```{r orforestprevhfhadj, cache=cacheon, dependson=c("ortabintfunc", "ortabprevhfh", "orforestintfunc"), fig.width=5, fig.height=10, fig.cap="Adjusted associations between SGLT2i use and characteristics in previous HFH < 1 year subgroups"}
+\elandscape
+
+```{r orforestprevhfhadj, cache=cacheon, dependson=c("ortabintfunc", "ortabprevhfh", "orforestintfunc"), fig.width=6, fig.height=10, fig.cap="Adjusted associations between SGLT2i use and characteristics in previous HFH < 1 year subgroups"}
 
 predadj <- predall$preds %>%
   select(Variable, contains("adj"))
 
-plotforest(forestdata = predadj, levs = levs, add1 = 3.5)
+plotforest(forestdata = predadj, levs = levs, add1 = 3)
 ```

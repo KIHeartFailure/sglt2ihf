@@ -99,7 +99,7 @@ rsdata <- rsdata %>%
       shf_qol <= 75 ~ 3,
       shf_qol <= 100 ~ 4,
     ),
-    levels = 1:4, 
+    levels = 1:4,
     labels = c("0-25", "26-50", "51-75", "76-100")
     )
   )

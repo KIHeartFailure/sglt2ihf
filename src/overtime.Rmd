@@ -1,232 +1,83 @@
-```{r overtime, fig.cap="SGLT2i overtime", cache=cacheon}
+```{r overtimefunc, cache = cacheon}
 
-cexmy <- 1.2
-# c(bottom, left, top, right) default c(5, 4, 4, 2) + 0.1.
-par(mar = c(6, 4, .5, 2.5) + 0.1)
+overtimefunc <- function(overtimedata = overtime, filtergroups, groupnames, yearvar = "yearsemester", yearvarname = "Year:Semester") {
+  cexmy <- 1.2
+  # c(bottom, left, top, right) default c(5, 4, 4, 2) + 0.1.
+  par(mar = c(6, 4, .5, 2.5) + 0.1)
 
-plot(overtime %>% filter(var == "all") %>% pull(count),
-  overtime %>% filter(var == "all") %>% pull(percent),
-  type = "b",
-  pch = 19,
-  lty = 1,
-  col = global_cols[2],
-  lwd = 2,
-  # cex = 1.5,
-  axes = FALSE,
-  # xaxs = "i",
-  # yaxs = "i",
-  ylim = c(0, 40),
-  # xlim = c(2012 - 0.5, 2018 + 0.5),
-  ylab = "Percent",
-  xlab = "",
-  cex.lab = cexmy
-)
-matplot(overtime %>% filter(var == "dapa") %>% pull(count),
-  overtime %>% filter(var == "dapa") %>% pull(percent),
-  type = "b",
-  pch = 19,
-  lty = 1,
-  col = global_cols[4],
-  lwd = 2,
-  add = T
-)
-matplot(overtime %>% filter(var == "empa") %>% pull(count),
-  overtime %>% filter(var == "empa") %>% pull(percent),
-  type = "b",
-  pch = 19,
-  lty = 1,
-  col = global_cols[6],
-  lwd = 2,
-  add = T
-)
+  plot(overtimedata %>% filter(var == filtergroups[1]) %>% pull(count),
+    overtimedata %>% filter(var == filtergroups[1]) %>% pull(percent),
+    type = "b",
+    pch = 19,
+    lty = 1,
+    col = global_cols[2],
+    lwd = 2,
+    # cex = 1.5,
+    axes = FALSE,
+    # xaxs = "i",
+    # yaxs = "i",
+    ylim = c(0, 100),
+    # xlim = c(2012 - 0.5, 2018 + 0.5),
+    ylab = "Percent",
+    xlab = yearvarname,
+    cex.lab = cexmy
+  )
+  matplot(overtimedata %>% filter(var == filtergroups[2]) %>% pull(count),
+    overtimedata %>% filter(var == filtergroups[2]) %>% pull(percent),
+    type = "b",
+    pch = 19,
+    lty = 1,
+    col = global_cols[4],
+    lwd = 2,
+    add = T
+  )
+  if (length(filtergroups) == 3) {
+    matplot(overtimedata %>% filter(var == filtergroups[3]) %>% pull(count),
+      overtimedata %>% filter(var == filtergroups[3]) %>% pull(percent),
+      type = "b",
+      pch = 19,
+      lty = 1,
+      col = global_cols[6],
+      lwd = 2,
+      add = T
+    )
+  }
+  legend(
+    "topleft",
+    bty = "n",
+    groupnames,
+    col = global_cols[c(2, 4, 6)],
+    cex = cexmy, lwd = 2, lty = 1
+  )
+  axis(1, overtimedata %>% filter(var == filtergroups[1]) %>% pull(count),
+    overtimedata %>% filter(var == filtergroups[1]) %>% pull(!!sym(yearvar)),
+    cex.axis = cexmy, las = 1, gap.axis = 0.000001
+  )
 
-legend(
-  x = 0.5, y = 40, bty = "n", c("SGLT2i", "Dapagliflozin", "Empagliflozin"),
-  col = global_cols[c(2, 4, 6)],
-  cex = cexmy, lwd = 2, lty = 1
-)
-axis(1, overtime %>% filter(var == "all") %>% pull(count),
-  overtime %>% filter(var == "all") %>% pull(yearmonth),
-  cex.axis = cexmy, las = 2
-)
-axis(1,
-  at = mean(c(
-    min(overtime %>% filter(var == "all") %>% pull(count)),
-    max(overtime %>% filter(var == "all") %>% pull(count))
-  )), cex.axis = cexmy,
-  labels = "Year:Month", line = 4, tick = FALSE
-)
-
-axis(2, seq(0, 40, 5), c(seq(0, 35, 5), 100), las = 2, cex.axis = cexmy)
-plotrix::axis.break(2, 37.5, style = "slash")
+  axis(2, seq(0, 100, 10), las = 2, cex.axis = cexmy)
+  # axis(2, seq(0, 40, 5), c(seq(0, 35, 5), 100), las = 2, cex.axis = cexmy)
+  # plotrix::axis.break(2, 37.5, style = "slash")
+}
 ```
 
-```{r overtimeckd, fig.cap="SGLT2i overtime by CKD", cache=cacheon}
+```{r overtime, cache = cacheon, dependson="overtimefunc", fig.cap = "SGLT2i overtime - Alternative I", fig.show='hold', out.width="50%", fig.subcap=c('Overall and Substances', 'CKD', 'Diabetes (Type I excluded)', 'Previous HFH < 1 year'), fig.ncol=2}
 
-cexmy <- 1.2
-# c(bottom, left, top, right) default c(5, 4, 4, 2) + 0.1.
-par(mar = c(6, 4, .5, 2.5) + 0.1)
-
-plot(overtime %>% filter(var == "ckd") %>% pull(count),
-  overtime %>% filter(var == "ckd") %>% pull(percent),
-  type = "b",
-  pch = 19,
-  lty = 1,
-  col = global_cols[2],
-  lwd = 2,
-  # cex = 1.5,
-  axes = FALSE,
-  # xaxs = "i",
-  # yaxs = "i",
-  ylim = c(0, 40),
-  # xlim = c(2012 - 0.5, 2018 + 0.5),
-  ylab = "Percent",
-  xlab = "",
-  cex.lab = cexmy
+overtimefunc(
+  filtergroups = c("all", "dapa", "empa"),
+  groupnames = c("SGLT2i", "Dapagliflozin", "Empagliflozin")
 )
-matplot(overtime %>% filter(var == "nockd") %>% pull(count),
-  overtime %>% filter(var == "nockd") %>% pull(percent),
-  type = "b",
-  pch = 19,
-  lty = 1,
-  col = global_cols[4],
-  lwd = 2,
-  add = T
+overtimefunc(
+  filtergroups = c("ckd", "nockd"),
+  groupnames = c("eGFR <60", "eGFR \u226560")
 )
-
-legend(
-  x = 0.5, y = 40, bty = "n", c("eGFR <60", "eGFR \u226560"),
-  col = global_cols[c(2, 4)],
-  cex = cexmy, lwd = 2, lty = 1
+overtimefunc(
+  filtergroups = c("type2", "notype2"),
+  groupnames = c("Diabetes type II", "No diabetes")
 )
-axis(1, overtime %>% filter(var == "all") %>% pull(count),
-  overtime %>% filter(var == "all") %>% pull(yearmonth),
-  cex.axis = cexmy, las = 2
+overtimefunc(
+  filtergroups = c("prevhfh", "noprevhfh"),
+  groupnames = c("Previous HFH <1 year", "No previous HFH <1 year")
 )
-axis(1,
-  at = mean(c(
-    min(overtime %>% filter(var == "all") %>% pull(count)),
-    max(overtime %>% filter(var == "all") %>% pull(count))
-  )), cex.axis = cexmy,
-  labels = "Year:Month", line = 4, tick = FALSE
-)
-
-axis(2, seq(0, 40, 5), c(seq(0, 35, 5), 100), las = 2, cex.axis = cexmy)
-plotrix::axis.break(2, 37.5, style = "slash")
-```
-
-```{r overtimediabetes, fig.cap="SGLT2i overtime by diabetes (Type I excluded)", cache=cacheon}
-
-cexmy <- 1.2
-# c(bottom, left, top, right) default c(5, 4, 4, 2) + 0.1.
-par(mar = c(6, 4, .5, 2.5) + 0.1)
-
-plot(
-  overtime %>% filter(var == "type2") %>% pull(count),
-  overtime %>% filter(var == "type2") %>% pull(percent),
-  type = "b",
-  pch = 19,
-  lty = 1,
-  col = global_cols[2],
-  lwd = 2,
-  # cex = 1.5,
-  axes = FALSE,
-  # xaxs = "i",
-  # yaxs = "i",
-  ylim = c(0, 40),
-  # xlim = c(2012 - 0.5, 2018 + 0.5),
-  ylab = "Percent",
-  xlab = "",
-  cex.lab = cexmy
-)
-matplot(
-  overtime %>% filter(var == "notype2") %>% pull(count),
-  overtime %>% filter(var == "notype2") %>% pull(percent),
-  type = "b",
-  pch = 19,
-  lty = 1,
-  col = global_cols[4],
-  lwd = 2,
-  add = T
-)
-legend(
-  x = 0.5, y = 40, bty = "n", c("Diabetes type II", "No diabetes"),
-  col = global_cols[c(2, 4)],
-  cex = cexmy, lwd = 2, lty = 1
-)
-
-axis(1, overtime %>% filter(var == "all") %>% pull(count),
-  overtime %>% filter(var == "all") %>% pull(yearmonth),
-  cex.axis = cexmy, las = 2
-)
-axis(1,
-  at = mean(c(
-    min(overtime %>% filter(var == "all") %>% pull(count)),
-    max(overtime %>% filter(var == "all") %>% pull(count))
-  )), cex.axis = cexmy,
-  labels = "Year:Month", line = 4, tick = FALSE
-)
-
-axis(2, seq(0, 40, 5), c(seq(0, 35, 5), 100), las = 2, cex.axis = cexmy)
-plotrix::axis.break(2, 37.5, style = "slash")
-```
-
-\clearpage
-
-```{r overtimeprevhfh, fig.cap="SGLT2i overtime by previous HFH < 1 year", cache=cacheon}
-
-cexmy <- 1.2
-# c(bottom, left, top, right) default c(5, 4, 4, 2) + 0.1.
-par(mar = c(6, 4, .5, 2.5) + 0.1)
-
-plot(
-  overtime %>% filter(var == "prevhfh") %>% pull(count),
-  overtime %>% filter(var == "prevhfh") %>% pull(percent),
-  type = "b",
-  pch = 19,
-  lty = 1,
-  col = global_cols[2],
-  lwd = 2,
-  # cex = 1.5,
-  axes = FALSE,
-  # xaxs = "i",
-  # yaxs = "i",
-  ylim = c(0, 40),
-  # xlim = c(2012 - 0.5, 2018 + 0.5),
-  ylab = "Percent",
-  xlab = "",
-  cex.lab = cexmy
-)
-matplot(
-  overtime %>% filter(var == "noprevhfh") %>% pull(count),
-  overtime %>% filter(var == "noprevhfh") %>% pull(percent),
-  type = "b",
-  pch = 19,
-  lty = 1,
-  col = global_cols[4],
-  lwd = 2,
-  add = T
-)
-legend(
-  x = 0.5, y = 40, bty = "n", c("Previous HFH <1 year", "No previous HFH <1 year"),
-  col = global_cols[c(2, 4)],
-  cex = cexmy, lwd = 2, lty = 1
-)
-
-axis(1, overtime %>% filter(var == "all") %>% pull(count),
-  overtime %>% filter(var == "all") %>% pull(yearmonth),
-  cex.axis = cexmy, las = 2
-)
-axis(1,
-  at = mean(c(
-    min(overtime %>% filter(var == "all") %>% pull(count)),
-    max(overtime %>% filter(var == "all") %>% pull(count))
-  )), cex.axis = cexmy,
-  labels = "Year:Month", line = 4, tick = FALSE
-)
-
-axis(2, seq(0, 40, 5), c(seq(0, 35, 5), 100), las = 2, cex.axis = cexmy)
-plotrix::axis.break(2, 37.5, style = "slash")
 ```
 
 \clearpage
@@ -234,10 +85,111 @@ plotrix::axis.break(2, 37.5, style = "slash")
 ```{r overtimetab}
 overtimetab <- overtime %>%
   mutate(percent = fn(percent, 1)) %>%
-  select(var, yearmonth, den, num, percent)
+  select(var, yearsemester, den, num, percent)
 default_kable(overtimetab,
   scale_down = FALSE,
-  caption = "SGLT2i overtime (exact percent from Fig)",
-  longtable = TRUE
+  caption = "SGLT2i overtime (exact percent from Fig) - Alternative I"
+)
+```
+
+\clearpage
+
+```{r overtimefunc2, cache = cacheon}
+
+overtimefunccount <- function(sglt2var, rspop) {
+  out <- rspop %>%
+    group_by(shf_indexyearquarter) %>%
+    count(!!sym(sglt2var)) %>%
+    mutate(
+      den = sum(n),
+      percent = n / den * 100
+    ) %>%
+    ungroup() %>%
+    rename(num = n) %>%
+    filter(!!sym(sglt2var) == "Yes") %>%
+    mutate(count = 1:n()) %>%
+    select(-!!sym(sglt2var))
+}
+
+overtimeall <- overtimefunccount(sglt2var = "sos_ddr_sglt2", rspop = rsdata)
+overtimedapa <- overtimefunccount(sglt2var = "sos_ddr_sglt2_Dapagliflozin", rspop = rsdata)
+overtimeempa <- overtimefunccount(sglt2var = "sos_ddr_sglt2_Empagliflozin", rspop = rsdata)
+
+overtimenockd <- overtimefunccount(
+  sglt2var = "sos_ddr_sglt2",
+  rspop = rsdata %>% filter(!is.na(shf_gfrckdepi_cat) & shf_gfrckdepi_cat == ">=60")
+)
+overtimeckd <- overtimefunccount(
+  sglt2var = "sos_ddr_sglt2",
+  rspop = rsdata %>% filter(!is.na(shf_gfrckdepi_cat) & shf_gfrckdepi_cat == "<60")
+)
+overtimenotype2 <- overtimefunccount(
+  sglt2var = "sos_ddr_sglt2",
+  rspop = rsdata %>% filter(!is.na(shf_sos_com_diabetestype) & shf_sos_com_diabetestype == "No")
+)
+overtimetype2 <- overtimefunccount(
+  sglt2var = "sos_ddr_sglt2",
+  rspop = rsdata %>% filter(!is.na(shf_sos_com_diabetestype) & shf_sos_com_diabetestype == "Type II")
+)
+overtimenoprevhfh <- overtimefunccount(
+  sglt2var = "sos_ddr_sglt2",
+  rspop = rsdata %>% filter(!is.na(shf_sos_prevhfh) & shf_sos_prevhfh == "No previous HFH <1 year")
+)
+overtimeprevhfh <- overtimefunccount(
+  sglt2var = "sos_ddr_sglt2",
+  rspop = rsdata %>% filter(!is.na(shf_sos_prevhfh) & shf_sos_prevhfh == "Previous HFH <1 year")
+)
+
+overtimeshf <- bind_rows(
+  overtimeall %>% mutate(var = "all"),
+  overtimedapa %>% mutate(var = "dapa"),
+  overtimeempa %>% mutate(var = "empa"),
+  overtimenockd %>% mutate(var = "nockd"),
+  overtimeckd %>% mutate(var = "ckd"),
+  overtimenotype2 %>% mutate(var = "notype2"),
+  overtimetype2 %>% mutate(var = "type2"),
+  overtimenoprevhfh %>% mutate(var = "noprevhfh"),
+  overtimeprevhfh %>% mutate(var = "prevhfh")
+)
+```
+
+```{r overtime2, cache = cacheon, dependson=c("overtimefunc", "overtimefunc2"), fig.cap = "SGLT2i overtime - Alternative II", fig.show='hold', out.width="50%", fig.subcap=c('Overall and Substances', 'CKD', 'Diabetes (Type I excluded)', 'Previous HFH < 1 year'), fig.ncol=2}
+
+overtimefunc(
+  overtimedata = overtimeshf,
+  filtergroups = c("all", "dapa", "empa"),
+  groupnames = c("SGLT2i", "Dapagliflozin", "Empagliflozin"),
+  yearvar = "shf_indexyearquarter", yearvarname = "Year:Quarter"
+)
+overtimefunc(
+  overtimedata = overtimeshf,
+  filtergroups = c("ckd", "nockd"),
+  groupnames = c("eGFR <60", "eGFR \u226560"),
+  yearvar = "shf_indexyearquarter", yearvarname = "Year:Quarter"
+)
+overtimefunc(
+  overtimedata = overtimeshf,
+  filtergroups = c("type2", "notype2"),
+  groupnames = c("Diabetes type II", "No diabetes"),
+  yearvar = "shf_indexyearquarter", yearvarname = "Year:Quarter"
+)
+overtimefunc(
+  overtimedata = overtimeshf,
+  filtergroups = c("prevhfh", "noprevhfh"),
+  groupnames = c("Previous HFH <1 year", "No previous HFH <1 year"),
+  yearvar = "shf_indexyearquarter", yearvarname = "Year:Quarter"
+)
+```
+
+\clearpage
+
+```{r overtimetab2, cache = cacheon, dependson=c("overtimefunc2")}
+overtimetab <- overtimeshf %>%
+  mutate(percent = fn(percent, 1)) %>%
+  select(var, shf_indexyearquarter, den, num, percent)
+default_kable(overtimetab,
+  scale_down = FALSE,
+  caption = "SGLT2i overtime (exact percent from Fig) - Alternative II",
+  longtable = T
 )
 ```

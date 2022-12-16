@@ -67,7 +67,7 @@ colnames(percenttab) <- sanitize_text(
 write.xlsx(tab1, paste0("./output/tabs/Baseline characteristics_rowpercent", Sys.Date(), ".xlsx"), rowNames = FALSE)
 
 default_kable(percenttab,
-  font_size = 6,
+  font_size = 7,
   caption = "Baseline characteristics - Row percent",
   longtable = TRUE,
   escape = FALSE

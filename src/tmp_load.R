@@ -12,7 +12,7 @@ load(paste0(datapath, "rawData_scb.RData"))
 
 source("./munge/03-endtime.R")
 source("./munge/04-selection_swedehf.R")
-source("./munge/05-countryofbirth_child_scb.R")
+source("./munge/05-child_scb.R")
 source("./munge/06-lisa_scb.R")
 
 save(

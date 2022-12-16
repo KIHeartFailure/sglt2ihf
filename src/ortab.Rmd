@@ -1,7 +1,7 @@
 ```{r ortabfunc, cache=cacheon}
 
 predfunc <- function(sglt2var) {
-  
+
   # mult
   ormod <- with(imprsdata, glm(formula(paste0(sglt2var, "== 'Yes' ~ ", paste(modvars, collapse = " + "))),
     family = binomial(link = "logit")
@@ -129,7 +129,7 @@ plotforest <- function(forestdata) {
   maxmy <- ceiling(exp(max(forestdata$uci, na.rm = T)))
 
   # c(bottom, left, top, right)
-  par(mar = c(4, 18, 0, 0.5) + 0.2)
+  par(mar = c(3, 18, 0, 0.5) + 0.2)
 
   gplots::plotCI(
     x = forestdata$logor, y = forestdata$order,
@@ -180,7 +180,7 @@ plotforest <- function(forestdata) {
 
   axis(1,
     at = (log(maxmy) + log(minmy)) / 2, cex.axis = cextext,
-    labels = "Adjusted OR\n(95% CI)", line = 2, tick = FALSE
+    labels = "Adjusted OR (95% CI)", line = 1, tick = FALSE
   )
 }
 ```

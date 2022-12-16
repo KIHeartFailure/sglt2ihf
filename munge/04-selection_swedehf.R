@@ -13,7 +13,6 @@ rsdata <- left_join(rsdata,
   ateranvpnr %>% mutate(AterPnr = 1),
   by = c("lopnr" = "LopNr")
 )
-
 rsdata <- rsdata %>%
   filter(is.na(AterPnr)) %>% # reused personr
   select(-AterPnr)
@@ -26,13 +25,10 @@ ejireg <- fall_ej_i_register %>%
   slice(1) %>%
   ungroup() %>%
   mutate(notinreg = 1)
-
 rsdata <- left_join(rsdata,
   ejireg,
   by = c("lopnr", "shf_indexdtm" = "indexdtm")
-)
-
-rsdata <- rsdata %>%
+) %>%
   filter(is.na(notinreg)) %>% # not in scb register
   select(-notinreg)
 flow <- rbind(flow, c("Remove posts that are not present in SCB register", nrow(rsdata)))
@@ -55,7 +51,6 @@ rsdata <- rsdata %>%
 flow <- rbind(flow, c("EF < 40%", nrow(rsdata)))
 
 rsdata <- rsdata %>%
-  mutate(sos_outtime_death = as.numeric(censdtm - shf_indexdtm)) %>%
   filter(sos_outtime_death > 14)
 flow <- rbind(flow, c(">14 days follow-up (to avoid immortal time bias*)", nrow(rsdata)))
 
@@ -64,7 +59,6 @@ rsdata <- rsdata %>%
   arrange(shf_indexdtm) %>%
   slice(1) %>%
   ungroup()
-
 flow <- rbind(flow, c("First post / patient", nrow(rsdata)))
 
 colnames(flow) <- c("Criteria", "N")

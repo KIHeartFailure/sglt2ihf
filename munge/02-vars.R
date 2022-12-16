@@ -9,10 +9,10 @@ tabvars <- c(
   "sos_ddr_sglt2_Empagliflozin",
   "sos_ddr_sglt2prevusers",
   "sos_ddr_sglt2_Canagliflozin",
-  "sos_ddr_sglt2_Ertugliflozin", 
-  "sos_ddr_sglt2_Ipragliflozin", 
+  "sos_ddr_sglt2_Ertugliflozin",
+  "sos_ddr_sglt2_Ipragliflozin",
   "sos_ddr_sglt2_Sotagliflozin",
-  
+
   # demo
   "shf_indexyearquarter",
   "shf_sex",
@@ -79,8 +79,7 @@ tabvars <- c(
   "scb_famtype",
   "scb_child",
   "scb_education",
-  "scb_dispincome_cat", 
-  
+  "scb_dispincome_cat",
   "shf_qol",
   "shf_qol_cat"
 )
@@ -91,12 +90,10 @@ tabvars_not_in_mod <- c(
   "sos_ddr_sglt2_Empagliflozin",
   "sos_ddr_sglt2prevusers",
   "sos_ddr_sglt2_Canagliflozin",
-  "sos_ddr_sglt2_Ertugliflozin", 
-  "sos_ddr_sglt2_Ipragliflozin", 
+  "sos_ddr_sglt2_Ertugliflozin",
+  "sos_ddr_sglt2_Ipragliflozin",
   "sos_ddr_sglt2_Sotagliflozin",
-  
   "shf_indexyearquarter",
-  
   "shf_age",
   "shf_location",
   "shf_nyha",
@@ -112,8 +109,7 @@ tabvars_not_in_mod <- c(
   "sos_com_dialysis",
   "shf_sos_com_diabetestype",
   "sos_com_charlsonci",
-  "sos_com_charlsonci_cat", 
-  
+  "sos_com_charlsonci_cat",
   "shf_qol",
   "shf_qol_cat"
 )

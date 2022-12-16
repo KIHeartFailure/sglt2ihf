@@ -55,6 +55,7 @@ rsdata <- rsdata %>%
     censdtm = coalesce(
       pmin(sos_deathdtm, tmp_migrationdtm, na.rm = TRUE),
       global_endfollowup
-    )
+    ), 
+    sos_outtime_death = as.numeric(censdtm - shf_indexdtm)
   ) %>%
   select(-shf_deathdtm)

@@ -1,5 +1,5 @@
 
-# Antidiabetic treatments from DDR ----------------------------------------
+# Treatments from DDR ----------------------------------------
 
 # within 5 months prior to index
 
@@ -85,8 +85,8 @@ rsdata <- rsdata %>%
     ),
     levels = 1:5, labels = c(
       "No previous use",
-      "index-14 days",
-      "5m-<index",
+      "Index-14 days",
+      "5m-<Index",
       "5m-2 years",
       ">= 2 years"
     )
@@ -96,63 +96,52 @@ rsdata <- rsdata %>%
 
 # Overtime graph ----------------------------------------------------------
 
-
-overtimefunc <- function(year, month, lmdata, rspop) {
-  monthmid <- ymd(paste0(year, "-", month, "-15"))
+overtimefunc <- function(year, halfyear, lmdata, rspop) {
+  halfyeartmp <- ymd(paste0(year, "-", ifelse(halfyear == 1, "01", "07"), "-01"))
 
   popyear <- rspop %>%
     filter(
-      shf_indexdtm <= monthmid,
-      censdtm >= monthmid
-    )
+      shf_indexdtm <= halfyeartmp,
+      censdtm >= halfyeartmp
+    ) %>%
+    select(lopnr, shf_indexdtm)
 
-  lmyear <- inner_join(popyear,
+  lmyear <- inner_join(
+    popyear,
     lmdata %>%
-      filter(AR == year & monthe == month),
+      filter(AR == year & halfyeare == halfyear),
     by = "lopnr"
   ) %>%
     group_by(lopnr) %>%
     slice(1) %>%
     ungroup()
 
-  out <- c(year = year, month = month, den = popyear %>% count() %>% pull(n), num = lmyear %>% count() %>% pull(n))
+  out <- c(
+    year = year,
+    halfyear = halfyear,
+    den = popyear %>% count() %>% pull(n),
+    num = lmyear %>% count() %>% pull(n)
+  )
 }
 
 overtimefunc2 <- function(atc, rspop) {
   lmovertime <- lmtmp %>%
     mutate(
       atcneed = stringr::str_detect(ATC, atc),
-      monthe = month(EDATUM)
+      halfyeare = semester(EDATUM)
     ) %>%
     filter(atcneed)
 
-  overtime <- overtimefunc(2020, "11", lmdata = lmovertime, rspop)
-  overtime <- rbind(overtime, overtimefunc(2020, 12, lmdata = lmovertime, rspop))
-  overtime <- rbind(overtime, overtimefunc(year = 2021, month = 1, lmdata = lmovertime, rspop))
+  overtime <- overtimefunc(year = 2021, halfyear = 1, lmdata = lmovertime, rspop)
   overtime <- rbind(overtime, overtimefunc(2021, 2, lmdata = lmovertime, rspop))
-  overtime <- rbind(overtime, overtimefunc(2021, 3, lmdata = lmovertime, rspop))
-  overtime <- rbind(overtime, overtimefunc(2021, 4, lmdata = lmovertime, rspop))
-  overtime <- rbind(overtime, overtimefunc(2021, 5, lmdata = lmovertime, rspop))
-  overtime <- rbind(overtime, overtimefunc(2021, 6, lmdata = lmovertime, rspop))
-  overtime <- rbind(overtime, overtimefunc(2021, 7, lmdata = lmovertime, rspop))
-  overtime <- rbind(overtime, overtimefunc(2021, 8, lmdata = lmovertime, rspop))
-  overtime <- rbind(overtime, overtimefunc(2021, 9, lmdata = lmovertime, rspop))
-  overtime <- rbind(overtime, overtimefunc(2021, 10, lmdata = lmovertime, rspop))
-  overtime <- rbind(overtime, overtimefunc(2021, 11, lmdata = lmovertime, rspop))
-  overtime <- rbind(overtime, overtimefunc(2021, 12, lmdata = lmovertime, rspop))
   overtime <- rbind(overtime, overtimefunc(2022, 1, lmdata = lmovertime, rspop))
   overtime <- rbind(overtime, overtimefunc(2022, 2, lmdata = lmovertime, rspop))
-  overtime <- rbind(overtime, overtimefunc(2022, 3, lmdata = lmovertime, rspop))
-  overtime <- rbind(overtime, overtimefunc(2022, 4, lmdata = lmovertime, rspop))
-  overtime <- rbind(overtime, overtimefunc(2022, 5, lmdata = lmovertime, rspop))
-  overtime <- rbind(overtime, overtimefunc(2022, 6, lmdata = lmovertime, rspop))
-  overtime <- rbind(overtime, overtimefunc(2022, 7, lmdata = lmovertime, rspop))
 
   overtime <- overtime %>%
     as.data.frame() %>%
     mutate(
       percent = as.numeric(num) / as.numeric(den) * 100,
-      yearmonth = paste0(year, ":", ifelse(nchar(month) == 1, paste0("0", month), month)),
+      yearsemester = paste0(year, ":", halfyear),
       count = 1:n()
     )
 }

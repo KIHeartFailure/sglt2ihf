@@ -1,11 +1,10 @@
 ---
 title: 'Statistical report: Use of the inhibitors of sodium-glucose cotransporter 2 in patients with heart failure'
-subtitle: 'DRAFT'
 author: 'Statistician: Lina Benson'
   
 date: "`r Sys.Date()`"
 output:
-  pdf_document:
+  bookdown::pdf_document2: 
     dev: cairo_pdf
     fig_caption: yes
     fig_height: 7
@@ -17,18 +16,18 @@ nocite: '@*'
 urlcolor: blue
 linkcolor: black
 header-includes:
-   - \usepackage{draftwatermark}
    - \usepackage{subfig}
    - \usepackage{pdflscape}
    - \newcommand{\blandscape}{\begin{landscape}}
    - \newcommand{\elandscape}{\end{landscape}}
 ---
 
-\newpage 
-\tableofcontents 
+\clearpage
+
 \listoftables
 \listoffigures
-\newpage
+
+\clearpage
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
@@ -68,7 +67,7 @@ https://kiheartfailure.github.io/shfdb4/, v 4.0.1, but with longer follow-up.
 ```
 
 *if a patient dies immediately after the index visit he/she will not collect a drug prescribed at the index visit
-and thereby be defined as a sglt2 user. 
+and thereby be defined as a SGLT2i user. 
 
 First patient in: `r min(rsdata$shf_indexdtm)` and last patient in: `r max(rsdata$shf_indexdtm)`.  
 
@@ -96,6 +95,10 @@ default_kable(outcommeta, caption = "Comorbidities from NPR")
 default_kable(ccimeta, caption = "Charlson Comorbidity Index from NPR")
 ```
 
+Socio-economic variables from LISA are on a yearly basis and set to the year prior 
+to registration in SwedeHF. When data was extracted data for 2021 was not available 
+and therefore patients with index year 2022 receive values from 2000. 
+
 # Statistical analysis 
 
 ## General
@@ -114,11 +117,14 @@ Table \ref{tab:tab1}. SGLT2i use is not included in the imputation model.
 
 ## SGLT2i over time
 
-The denominator consists of persons that at the 
-middle of the month were present in SwedeHF with the specified inclusion/exclusion criteria 
-(so included in SwedeHF prior to 20xx-xx-15 but not dead/emigrated as of 20xx-xx-15). 
+In Figure \ref{fig:overtime} the denominator consists of persons that at each half year time period
+were present in SwedeHF with the specified inclusion/exclusion criteria 
+(so included in SwedeHF prior to 202x-x1/7-01 but not dead/emigrated as of 202x-1/7-01). 
 The numerator consists of the number of patients of the above with at least one SGLT2i 
-dispension during that year.  
+dispension during that halfyear time period. 
+
+In Figure \ref{fig:overtime2} the proportion of patients that, within 5 months 
+prior up until 14 days after their registration in SwedeHF, collect an SGLT2 prescription is presented. 
 
 ```{r, child = "./src/overtime.Rmd"}
 
@@ -131,6 +137,8 @@ dispension during that year.
 ```{r, child = "./src/tab1.Rmd"}
 
 ```
+
+\clearpage
 
 ```{r, child = "./src/tab1_rowpercent.Rmd"}
 
@@ -150,8 +158,7 @@ The region is "sjukvårdsregion" that the hospital/primary care centre belongs t
 
 Odds ratios are estimated using logistic regression with SGLT2i use as outcome. 
 Outliers were investigated with Cook's distance and multicollinearity 
-with the variance inflation factor.
-=> XX. 
+with the variance inflation factor and no action was deemed necessary.
 
 ```{r, child = "./src/ortab.Rmd"}
 
