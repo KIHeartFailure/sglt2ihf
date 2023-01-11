@@ -177,6 +177,15 @@ overtimeprevhfh <- overtimefunc2(
   rspop = rsdata %>% filter(!is.na(shf_sos_prevhfh) & shf_sos_prevhfh == "Previous HFH <1 year")
 )
 
+overtimemale <- overtimefunc2(
+  atc = global_sglt2atc,
+  rspop = rsdata %>% filter(shf_sex == "Male")
+)
+overtimefemale <- overtimefunc2(
+  atc = global_sglt2atc,
+  rspop = rsdata %>% filter(shf_sex == "Female")
+)
+
 
 overtime <- bind_rows(
   overtimeall %>% mutate(var = "all"),
@@ -187,7 +196,9 @@ overtime <- bind_rows(
   overtimenotype2 %>% mutate(var = "notype2"),
   overtimetype2 %>% mutate(var = "type2"),
   overtimenoprevhfh %>% mutate(var = "noprevhfh"),
-  overtimeprevhfh %>% mutate(var = "prevhfh")
+  overtimeprevhfh %>% mutate(var = "prevhfh"), 
+  overtimemale %>% mutate(var = "male"), 
+  overtimefemale %>% mutate(var = "female")
 )
 
 metalm <- metalm[1:7, ]

@@ -60,7 +60,7 @@ overtimefunc <- function(overtimedata = overtime, filtergroups, groupnames, year
 }
 ```
 
-```{r overtime, cache = cacheon, dependson="overtimefunc", fig.cap = "SGLT2i overtime - Alternative I", fig.show='hold', out.width="50%", fig.subcap=c('Overall and Substances', 'CKD', 'Diabetes (Type I excluded)', 'Previous HFH < 1 year'), fig.ncol=2}
+```{r overtime, cache = cacheon, dependson="overtimefunc", fig.cap = "SGLT2i overtime - Alternative I", fig.show='hold', out.width="40%", fig.subcap=c('Overall and Substances', 'CKD', 'Diabetes (Type I excluded)', 'Previous HFH < 1 year', 'Sex'), fig.ncol=2}
 
 overtimefunc(
   filtergroups = c("all", "dapa", "empa"),
@@ -77,6 +77,10 @@ overtimefunc(
 overtimefunc(
   filtergroups = c("prevhfh", "noprevhfh"),
   groupnames = c("Previous HFH <1 year", "No previous HFH <1 year")
+)
+overtimefunc(
+  filtergroups = c("male", "female"),
+  groupnames = c("Male", "Female")
 )
 ```
 
@@ -139,6 +143,14 @@ overtimeprevhfh <- overtimefunccount(
   sglt2var = "sos_ddr_sglt2",
   rspop = rsdata %>% filter(!is.na(shf_sos_prevhfh) & shf_sos_prevhfh == "Previous HFH <1 year")
 )
+overtimemale <- overtimefunccount(
+  sglt2var = "sos_ddr_sglt2",
+  rspop = rsdata %>% filter(shf_sex == "Male")
+)
+overtimefemale <- overtimefunccount(
+  sglt2var = "sos_ddr_sglt2",
+  rspop = rsdata %>% filter(shf_sex == "Female")
+)
 
 overtimeshf <- bind_rows(
   overtimeall %>% mutate(var = "all"),
@@ -149,11 +161,13 @@ overtimeshf <- bind_rows(
   overtimenotype2 %>% mutate(var = "notype2"),
   overtimetype2 %>% mutate(var = "type2"),
   overtimenoprevhfh %>% mutate(var = "noprevhfh"),
-  overtimeprevhfh %>% mutate(var = "prevhfh")
+  overtimeprevhfh %>% mutate(var = "prevhfh"),
+  overtimemale %>% mutate(var = "male"),
+  overtimefemale %>% mutate(var = "female")
 )
 ```
 
-```{r overtime2, cache = cacheon, dependson=c("overtimefunc", "overtimefunc2"), fig.cap = "SGLT2i overtime - Alternative II", fig.show='hold', out.width="50%", fig.subcap=c('Overall and Substances', 'CKD', 'Diabetes (Type I excluded)', 'Previous HFH < 1 year'), fig.ncol=2}
+```{r overtime2, cache = cacheon, dependson=c("overtimefunc", "overtimefunc2"), fig.cap = "SGLT2i overtime - Alternative II", fig.show='hold', out.width="40%", fig.subcap=c('Overall and Substances', 'CKD', 'Diabetes (Type I excluded)', 'Previous HFH < 1 year', 'Sex'), fig.ncol=2}
 
 overtimefunc(
   overtimedata = overtimeshf,
@@ -177,6 +191,12 @@ overtimefunc(
   overtimedata = overtimeshf,
   filtergroups = c("prevhfh", "noprevhfh"),
   groupnames = c("Previous HFH <1 year", "No previous HFH <1 year"),
+  yearvar = "shf_indexyearquarter", yearvarname = "Year:Quarter"
+)
+overtimefunc(
+  overtimedata = overtimeshf,
+  filtergroups = c("male", "female"),
+  groupnames = c("Male", "Female"),
   yearvar = "shf_indexyearquarter", yearvarname = "Year:Quarter"
 )
 ```

@@ -383,3 +383,49 @@ predadj <- predall$preds %>%
 
 plotforest(forestdata = predadj, levs = levs, add1 = 3)
 ```
+
+\blandscape
+
+```{r ortabsex, dependson="ortabintfunc", cache=cacheon}
+
+predall <- predfunc(
+  var = "shf_sex"
+)
+
+colnames(predall$predsprint) <- c(
+  "Variable",
+  rep(c(
+    rep(c("OR (95% CI)", "p-value"), 2),
+    "p-value interaction"
+  ), 2)
+)
+
+write.xlsx(predall$predsprint, paste0(
+  "./output/tabs/Associations between SGLT2i use and characteristics in sex subgroups_", Sys.Date(), ".xlsx"
+), rowNames = FALSE, overwrite = TRUE)
+
+
+levs <- levels(rsdata %>% pull(shf_sex))
+
+default_kable(predall$predsprint,
+  font_size = 6,
+  caption = "Associations between SGLT2i use and characteristics in sex subgroups",
+  escape = T
+) %>%
+  add_header_above(c(
+    " " = 1,
+    setNames(2, levs[1]), setNames(2, levs[2]), "",
+    setNames(2, levs[1]), setNames(2, levs[2]), ""
+  )) %>%
+  add_header_above(c(" " = 1, "Crude" = 5, "Adjusted" = 5))
+```
+
+\elandscape
+
+```{r orforestsexadj, cache=cacheon, dependson=c("ortabintfunc", "ortabsex", "orforestintfunc"), fig.width=6, fig.height=10, fig.cap="Adjusted associations between SGLT2i use and characteristics in sex subgroups"}
+
+predadj <- predall$preds %>%
+  select(Variable, contains("adj"))
+
+plotforest(forestdata = predadj, levs = levs, add1 = 3)
+```
