@@ -81,6 +81,21 @@ The median age (IQR) is `r rsdata %>% summarise(med = fn(median(shf_age), dig = 
   filter(shf_sex == "Female") %>%
   pull(perc)`% females.    
 
+For the supplementary analysis excluding patients with Type I diabetes, eGFR < 20 and dialysis: 
+
+First patient in: `r min(rsdata$shf_indexdtm[rsdata$subset])` and last patient in: 
+`r max(rsdata$shf_indexdtm[rsdata$subset])`.  
+
+The median age (IQR) is `r rsdata %>% filter(subset) %>% summarise(med = fn(median(shf_age), dig = 1),
+                                             q1 = fn(quantile(shf_age, probs = 0.25), dig = 1),
+                                             q3 = fn(quantile(shf_age, probs = 0.75), dig = 1)) %>%
+                                   mutate(out = paste0(med, " (", q1, "-", q3, ")")) %>%
+                                   pull(out)` and 
+`r rsdata %>% filter(subset) %>% count(shf_sex) %>%
+  mutate(perc = fn(n / sum(n) * 100, 1)) %>%
+  filter(shf_sex == "Female") %>%
+  pull(perc)`% females.    
+  
 ## Created variables 
 
 ```{r atc}
@@ -146,11 +161,29 @@ prior up until 14 days after their registration in SwedeHF, collect an SGLT2 pre
 
 \clearpage 
 
+## Variation in SGLT2i use across regions
+
 The region is "sjukvårdsregion" that the hospital/primary care centre belongs to. 
 
 ```{r, child = "./src/regional.Rmd"}
 
 ```
+
+\clearpage 
+
+## Variation in SGLT2i use across centres
+
+```{r, child = "./src/mor.Rmd"}
+
+```
+
+In order to evaluate the difference in likelihood of being prescribed SGLT2i at two randomly 
+selected centres the median odds ratio (MOR)[@mor] was calculated for a model 
+including the intercept and centre as a random variable. 
+
+The MOR was `r fn(MOR$vcov, 2)`. 
+
+The number of centres with $\le$ 10 patients was `r kollcenter %>% filter(n10 == "<=10") %>% pull(np)`.
 
 \clearpage 
 
@@ -175,6 +208,17 @@ but with the advantage of obtaining a p-value. Note therefore that also the adju
 estimates are obtained from different models. 
 
 ```{r, child = "./src/ortab_int.Rmd"}
+
+```
+
+\clearpage
+
+## Discontinuation in SGLT2i
+
+Discontinuation is considered to occur if there is > 5 months gap between pill dispensations. If this is the case, the discontinuation date is set to 3 months after the last dispensation. The % discontinued at 6 months, 1 year and 1.5 years after index is estimated with the Kaplan-Meier method were patients are censored at last follow-up 
+(`r global_endfollowup`), death or emigration.  
+
+```{r, child = "./src/disc.Rmd"}
 
 ```
 

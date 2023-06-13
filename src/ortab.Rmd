@@ -1,9 +1,9 @@
 ```{r ortabfunc, cache=cacheon}
 
-predfunc <- function(sglt2var) {
+predfunc <- function(sglt2var, impdata = imprsdata) {
 
   # mult
-  ormod <- with(imprsdata, glm(formula(paste0(sglt2var, "== 'Yes' ~ ", paste(modvars, collapse = " + "))),
+  ormod <- with(impdata, glm(formula(paste0(sglt2var, "== 'Yes' ~ ", paste(modvars, collapse = " + "))),
     family = binomial(link = "logit")
   ))
 
@@ -29,7 +29,7 @@ predfunc <- function(sglt2var) {
 
   # crude
   for (i in seq_along(modvars)) {
-    ormoduni <- with(imprsdata, glm(formula(paste0(sglt2var, "== 'Yes' ~ ", modvars[i])),
+    ormoduni <- with(impdata, glm(formula(paste0(sglt2var, "== 'Yes' ~ ", modvars[i])),
       family = binomial(link = "logit")
     ))
 
@@ -269,6 +269,104 @@ default_kable(predall$predallprint,
 ```
 
 ```{r orforestadjempa, cache=cacheon, dependson=c("ortabfunc", "ortabempa", "orforestfunc"), fig.width=5, fig.height=10, fig.cap="Adjusted associations between Empagliflozin use and characteristics"}
+
+predadj <- predall$predall %>%
+  mutate(across(c("logor.y", "lci.y", "uci.y"), as.numeric)) %>%
+  select(Variable, ends_with(".y"))
+
+colnames(predadj) <- str_remove_all(colnames(predadj), ".y")
+
+plotforest(forestdata = predadj)
+```
+
+
+
+
+
+```{r sens-ortab, dependson="ortabfunc", cache=cacheon}
+
+predall <- predfunc(sglt2var = "sos_ddr_sglt2", impdata = imprsdata_subset)
+
+colnames(predall$predallprint) <- c("Variable", rep(c("OR (95% CI)", "p-value"), 2))
+
+write.xlsx(predall$predallprint, paste0(
+  "./output/tabs/sens_Associations between SGLT2i use and characteristics_", Sys.Date(), ".xlsx"
+), rowNames = FALSE, overwrite = TRUE)
+
+
+default_kable(predall$predallprint,
+  font_size = 6,
+  caption = "Associations between SGLT2i use and characteristics - excluding patients with Type I diabetes, eGFR < 20 and dialysis",
+  escape = T
+) %>%
+  add_header_above(c(" " = 1, "Crude" = 2, "Adjusted" = 2))
+```
+
+```{r sens-orforestadj, cache=cacheon, dependson=c("ortabfunc", "sens-ortab", "orforestfunc"), fig.width=5, fig.height=10, fig.cap="Adjusted associations between SGLT2i use and characteristics - excluding patients with Type I diabetes, eGFR < 20 and dialysis"}
+
+predadj <- predall$predall %>%
+  mutate(across(c("logor.y", "lci.y", "uci.y"), as.numeric)) %>%
+  select(Variable, ends_with(".y"))
+
+colnames(predadj) <- str_remove_all(colnames(predadj), ".y")
+
+plotforest(forestdata = predadj)
+```
+
+\clearpage
+
+```{r sens-ortabdapa, dependson="ortabfunc", cache=cacheon}
+
+predall <- predfunc(sglt2var = "sos_ddr_sglt2_Dapagliflozin", impdata = imprsdata_subset)
+
+colnames(predall$predallprint) <- c("Variable", rep(c("OR (95% CI)", "p-value"), 2))
+
+write.xlsx(predall$predallprint, paste0(
+  "./output/tabs/sens_Associations between Dapagliflozin use and characteristics_", Sys.Date(), ".xlsx"
+), rowNames = FALSE, overwrite = TRUE)
+
+
+default_kable(predall$predallprint,
+  font_size = 6,
+  caption = "Associations between Dapagliflozin use and characteristics - excluding patients with Type I diabetes, eGFR < 20 and dialysis",
+  escape = T
+) %>%
+  add_header_above(c(" " = 1, "Crude" = 2, "Adjusted" = 2))
+```
+
+```{r sens-orforestadjdapa, cache=cacheon, dependson=c("ortabfunc", "sens-ortabdapa", "orforestfunc"), fig.width=5, fig.height=10, fig.cap="Adjusted associations between Dapagliflozin use and characteristics - excluding patients with Type I diabetes, eGFR < 20 and dialysis"}
+
+predadj <- predall$predall %>%
+  mutate(across(c("logor.y", "lci.y", "uci.y"), as.numeric)) %>%
+  select(Variable, ends_with(".y"))
+
+colnames(predadj) <- str_remove_all(colnames(predadj), ".y")
+
+plotforest(forestdata = predadj)
+```
+
+\clearpage
+
+```{r sens-ortabempa, dependson="ortabfunc", cache=cacheon}
+
+predall <- predfunc(sglt2var = "sos_ddr_sglt2_Empagliflozin", impdata = imprsdata_subset)
+
+colnames(predall$predallprint) <- c("Variable", rep(c("OR (95% CI)", "p-value"), 2))
+
+write.xlsx(predall$predallprint, paste0(
+  "./output/tabs/sens_Associations between Empagliflozin use and characteristics_", Sys.Date(), ".xlsx"
+), rowNames = FALSE, overwrite = TRUE)
+
+
+default_kable(predall$predallprint,
+  font_size = 6,
+  caption = "Associations between Empagliflozin use and characteristics - excluding patients with Type I diabetes, eGFR < 20 and dialysis",
+  escape = T
+) %>%
+  add_header_above(c(" " = 1, "Crude" = 2, "Adjusted" = 2))
+```
+
+```{r sens-orforestadjempa, cache=cacheon, dependson=c("ortabfunc", "sens-ortabempa", "orforestfunc"), fig.width=5, fig.height=10, fig.cap="Adjusted associations between Empagliflozin use and characteristics - excluding patients with Type I diabetes, eGFR < 20 and dialysis"}
 
 predadj <- predall$predall %>%
   mutate(across(c("logor.y", "lci.y", "uci.y"), as.numeric)) %>%

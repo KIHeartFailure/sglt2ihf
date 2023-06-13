@@ -1,0 +1,21 @@
+```{r mor, cache=cacheon}
+
+mod <- glmer(sos_ddr_sglt2 == "Yes" ~ 1 + (1 | shf_centre),
+  data = rsdata,
+  family = binomial(link = "logit")
+)
+v <- as.data.frame(VarCorr(mod))[4]
+MOR <- exp(sqrt(2 * v) * qnorm(0.75))
+
+kollcenter <- rsdata %>%
+  count(shf_centre) %>%
+  mutate(n10 = case_when(
+    n <= 10 ~ "<=10",
+    n > 10 ~ ">10"
+  )) %>%
+  count(n10) %>%
+  mutate(
+    per = fn(n / sum(n) * 100, 0),
+    np = paste0(n, " (", per, "%)")
+  )
+```

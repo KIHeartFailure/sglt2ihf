@@ -1,0 +1,37 @@
+```{r disc, cache=cacheon}
+
+fits <- survfit(Surv(time_disc, disc == 1) ~ 1,
+  data = rsdata %>% filter(sos_ddr_sglt2 == "Yes")
+)
+
+surv <- summary(fits, times = c(0.5, 1, 1.5) * 365, extend = T)
+
+surv <- tibble(
+  time = c("6 months", "1 year", "1.5 years"),
+  disc = fn((1 - surv$surv) * 100, 1)
+)
+
+default_kable(surv, 
+              scale_down = F, 
+              caption = "Discontinuation", col.names = c("Time point", "% discontinued"))
+```
+
+```{r discsub, cache=cacheon}
+
+fits <- survfit(Surv(time_disc, disc == 1) ~ 1,
+  data = rsdata %>% filter(sos_ddr_sglt2 == "Yes" & subset)
+)
+
+surv <- summary(fits, times = c(0.5, 1, 1.5) * 365, extend = T)
+
+surv <- tibble(
+  time = c("6 months", "1 year", "1.5 years"),
+  disc = fn((1 - surv$surv) * 100, 1)
+)
+
+default_kable(surv,
+              scale_down = F, 
+  caption = "Discontinuation - excluding patients with Type I diabetes, eGFR < 20 and dialysis",
+  col.names = c("Time point", "% discontinued")
+)
+```

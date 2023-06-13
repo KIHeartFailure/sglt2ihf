@@ -44,25 +44,28 @@ source("./munge/09-charlsoncomorbindex_sos.R")
 # run 10
 source("./munge/10-recat.R")
 
+# run 11
+source("./munge/11-create_subset.R")
+
 save(
   file = "./data/tmprsdata2.RData",
   list = c("rsdata", "flow", "outcommeta", "ccimeta")
 )
 
-# run 11
+# run 12
 ProjectTemplate::reload.project()
 
 load("./data/tmprsdata2.RData")
 load("./data/lmsglt2.RData")
 
-source("./munge/11-lmvar.R")
+source("./munge/12-lmvar.R")
 
 save(
   file = "./data/tmprsdata3.RData",
-  list = c("rsdata", "flow", "outcommeta", "ccimeta", "metalm", "overtime")
+  list = c("rsdata", "flow", "outcommeta", "ccimeta", "metalm", "overtime", "overtime_subset")
 )
 
-# run 02, 12
+# run 02, 13
 ProjectTemplate::reload.project(
   reset = TRUE,
   data_loading = FALSE,
@@ -76,7 +79,7 @@ meta_variables <- read.xlsx("C:/Users/Lina/STATISTIK/Projects/20210525_shfdb4/dm
 load("./data/tmprsdata3.RData")
 
 source("./munge/02-vars.R")
-source("./munge/12-impute.R")
+source("./munge/13-impute.R")
 
 
 # save
@@ -86,12 +89,14 @@ ProjectTemplate::cache("meta_variables")
 ProjectTemplate::cache("flow")
 ProjectTemplate::cache("rsdata")
 ProjectTemplate::cache("imprsdata")
+ProjectTemplate::cache("imprsdata_subset")
 
 ProjectTemplate::cache("metalm")
 ProjectTemplate::cache("outcommeta")
 ProjectTemplate::cache("ccimeta")
 
 ProjectTemplate::cache("overtime")
+ProjectTemplate::cache("overtime_subset")
 
 ProjectTemplate::cache("tabvars")
 ProjectTemplate::cache("modvars")

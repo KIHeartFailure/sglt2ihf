@@ -386,6 +386,99 @@ plotforest(forestdata = predadj, levs = levs, add1 = 3)
 
 \blandscape
 
+```{r ortablocation, dependson="ortabintfunc", cache=cacheon}
+
+predall <- predfunc(
+  var = "shf_location", 
+  novar = "shf_sos_prevhfh"
+)
+
+colnames(predall$predsprint) <- c(
+  "Variable",
+  rep(c(
+    rep(c("OR (95% CI)", "p-value"), 2),
+    "p-value interaction"
+  ), 2)
+)
+
+write.xlsx(predall$predsprint, paste0(
+  "./output/tabs/Associations between SGLT2i use and characteristics in location subgroups_", Sys.Date(), ".xlsx"
+), rowNames = FALSE, overwrite = TRUE)
+
+
+levs <- levels(rsdata %>% pull(shf_location))
+
+default_kable(predall$predsprint,
+  font_size = 6,
+  caption = "Associations between SGLT2i use and characteristics in location subgroups",
+  escape = T
+) %>%
+  add_header_above(c(
+    " " = 1,
+    setNames(2, levs[1]), setNames(2, levs[2]), "",
+    setNames(2, levs[1]), setNames(2, levs[2]), ""
+  )) %>%
+  add_header_above(c(" " = 1, "Crude" = 5, "Adjusted" = 5))
+```
+
+\elandscape
+
+```{r orforestlocationadj, cache=cacheon, dependson=c("ortabintfunc", "ortablocation", "orforestintfunc"), fig.width=6, fig.height=10, fig.cap="Adjusted associations between SGLT2i use and characteristics in location subgroups"}
+
+predadj <- predall$preds %>%
+  select(Variable, contains("adj"))
+
+plotforest(forestdata = predadj, levs = levs, add1 = 5.5)
+```
+
+\blandscape
+
+```{r ortabdurhf, dependson="ortabintfunc", cache=cacheon}
+
+predall <- predfunc(
+  var = "shf_durationhf"
+)
+
+colnames(predall$predsprint) <- c(
+  "Variable",
+  rep(c(
+    rep(c("OR (95% CI)", "p-value"), 2),
+    "p-value interaction"
+  ), 2)
+)
+
+write.xlsx(predall$predsprint, paste0(
+  "./output/tabs/Associations between SGLT2i use and characteristics in duration of HF subgroups_", Sys.Date(), ".xlsx"
+), rowNames = FALSE, overwrite = TRUE)
+
+
+levs <- levels(rsdata %>% pull(shf_durationhf))
+
+default_kable(predall$predsprint,
+  font_size = 6,
+  caption = "Associations between SGLT2i use and characteristics in duration of HF subgroups",
+  escape = T
+) %>%
+  add_header_above(c(
+    " " = 1,
+    setNames(2, levs[1]), setNames(2, levs[2]), "",
+    setNames(2, levs[1]), setNames(2, levs[2]), ""
+  )) %>%
+  add_header_above(c(" " = 1, "Crude" = 5, "Adjusted" = 5))
+```
+
+\elandscape
+
+```{r orforestdurhfadj, cache=cacheon, dependson=c("ortabintfunc", "ortabdurhf", "orforestintfunc"), fig.width=6, fig.height=10, fig.cap="Adjusted associations between SGLT2i use and characteristics in duration of HF subgroups"}
+
+predadj <- predall$preds %>%
+  select(Variable, contains("adj"))
+
+plotforest(forestdata = predadj, levs = levs, add1 = 3)
+```
+
+\blandscape
+
 ```{r ortabsex, dependson="ortabintfunc", cache=cacheon}
 
 predall <- predfunc(
@@ -423,6 +516,294 @@ default_kable(predall$predsprint,
 \elandscape
 
 ```{r orforestsexadj, cache=cacheon, dependson=c("ortabintfunc", "ortabsex", "orforestintfunc"), fig.width=6, fig.height=10, fig.cap="Adjusted associations between SGLT2i use and characteristics in sex subgroups"}
+
+predadj <- predall$preds %>%
+  select(Variable, contains("adj"))
+
+plotforest(forestdata = predadj, levs = levs, add1 = 3)
+```
+
+
+
+
+\blandscape
+
+```{r sens-ortabgfr, dependson="ortabintfunc", cache=cacheon}
+
+predall <- predfunc(
+  var = "shf_gfrckdepi_cat", 
+  impdata = imprsdata_subset
+)
+
+colnames(predall$predsprint) <- c(
+  "Variable",
+  rep(c(
+    rep(c("OR (95% CI)", "p-value"), 2),
+    "p-value interaction"
+  ), 2)
+)
+
+write.xlsx(predall$predsprint, paste0(
+  "./output/tabs/sens_Associations between SGLT2i use and characteristics in GFR subgroups_", Sys.Date(), ".xlsx"
+), rowNames = FALSE, overwrite = TRUE)
+
+levs <- levels(rsdata %>% pull(shf_gfrckdepi_cat))
+
+default_kable(predall$predsprint,
+  font_size = 6,
+  caption = "Associations between SGLT2i use and characteristics in GFR subgroups - excluding patients with Type I diabetes, eGFR < 20 and dialysis",
+  escape = T
+) %>%
+  add_header_above(c(
+    " " = 1,
+    setNames(2, levs[1]), setNames(2, levs[2]), "",
+    setNames(2, levs[1]), setNames(2, levs[2]), ""
+  )) %>%
+  add_header_above(c(" " = 1, "Crude" = 5, "Adjusted" = 5))
+```
+
+\elandscape
+
+```{r sens-orforestgfradj, cache=cacheon, dependson=c("ortabintfunc", "sens-ortabgfr", "orforestintfunc"), fig.width=6, fig.height=10, fig.cap="Adjusted associations between SGLT2i use and characteristics in GFR subgroups - excluding patients with Type I diabetes, eGFR < 20 and dialysis"}
+
+predadj <- predall$preds %>%
+  select(Variable, contains("adj"))
+
+plotforest(forestdata = predadj, levs = levs, add1 = 3)
+```
+
+\blandscape
+
+```{r sens-ortabdiabetes, dependson="ortabintfunc", cache=cacheon}
+
+impdia_sub <- miceadds::subset_datlist(imprsdata, 
+                                       expr_subset = !is.na(rsdata$shf_sos_com_diabetestype_mod) & rsdata$subset)
+predall <- predfunc(
+  impdata = impdia_sub,
+  var = "shf_sos_com_diabetestype_mod", 
+  novar = "shf_sos_com_diabetes"
+)
+
+colnames(predall$predsprint) <- c(
+  "Variable",
+  rep(c(
+    rep(c("OR (95% CI)", "p-value"), 2),
+    "p-value interaction"
+  ), 2)
+)
+
+write.xlsx(predall$predsprint, paste0(
+  "./output/tabs/sens_Associations between SGLT2i use and characteristics in diabetes subgroups_", Sys.Date(), ".xlsx"
+), rowNames = FALSE, overwrite = TRUE)
+
+
+levs <- levels(rsdata %>% pull(shf_sos_com_diabetestype_mod))
+
+default_kable(predall$predsprint,
+  font_size = 6,
+  caption = "Associations between SGLT2i use and characteristics in diabetes subgroups (Type I excluded) - excluding patients with Type I diabetes, eGFR < 20 and dialysis",
+  escape = T
+) %>%
+  add_header_above(c(
+    " " = 1,
+    setNames(2, levs[1]), setNames(2, levs[2]), "",
+    setNames(2, levs[1]), setNames(2, levs[2]), ""
+  )) %>%
+  add_header_above(c(" " = 1, "Crude" = 5, "Adjusted" = 5))
+```
+
+\elandscape
+
+```{r sens-orforestdiabetesadj, cache=cacheon, dependson=c("ortabintfunc", "sens-ortabdiabetes", "orforestintfunc"), fig.width=6, fig.height=10, fig.cap="Adjusted associations between SGLT2i use and characteristics in diabetes subgroups (Type I excluded) - excluding patients with Type I diabetes, eGFR < 20 and dialysis"}
+
+predadj <- predall$preds %>%
+  select(Variable, contains("adj"))
+
+plotforest(forestdata = predadj, levs = levs, add1 = 4)
+```
+
+\blandscape
+
+```{r sens-ortabprevhfh, dependson="ortabintfunc", cache=cacheon}
+
+predall <- predfunc(
+  var = "shf_sos_prevhfh", 
+  impdata = imprsdata_subset
+)
+
+colnames(predall$predsprint) <- c(
+  "Variable",
+  rep(c(
+    rep(c("OR (95% CI)", "p-value"), 2),
+    "p-value interaction"
+  ), 2)
+)
+
+write.xlsx(predall$predsprint, paste0(
+  "./output/tabs/sens_Associations between SGLT2i use and characteristics in previous HFH subgroups_", Sys.Date(), ".xlsx"
+), rowNames = FALSE, overwrite = TRUE)
+
+
+levs <- levels(rsdata %>% pull(shf_sos_prevhfh))
+
+default_kable(predall$predsprint,
+  font_size = 6,
+  caption = "Associations between SGLT2i use and characteristics in previous HFH < 1 year subgroups - excluding patients with Type I diabetes, eGFR < 20 and dialysis",
+  escape = T
+) %>%
+  add_header_above(c(
+    " " = 1,
+    setNames(2, levs[1]), setNames(2, levs[2]), "",
+    setNames(2, levs[1]), setNames(2, levs[2]), ""
+  )) %>%
+  add_header_above(c(" " = 1, "Crude" = 5, "Adjusted" = 5))
+```
+
+\elandscape
+
+```{r sens-orforestprevhfhadj, cache=cacheon, dependson=c("ortabintfunc", "sens-ortabprevhfh", "orforestintfunc"), fig.width=6, fig.height=10, fig.cap="Adjusted associations between SGLT2i use and characteristics in previous HFH < 1 year subgroups - excluding patients with Type I diabetes, eGFR < 20 and dialysis"}
+
+predadj <- predall$preds %>%
+  select(Variable, contains("adj"))
+
+plotforest(forestdata = predadj, levs = levs, add1 = 3)
+```
+
+\blandscape
+
+```{r sens-ortablocation, dependson="ortabintfunc", cache=cacheon}
+
+predall <- predfunc(
+  var = "shf_location", 
+  novar = "shf_sos_prevhfh",
+  impdata = imprsdata_subset
+)
+
+colnames(predall$predsprint) <- c(
+  "Variable",
+  rep(c(
+    rep(c("OR (95% CI)", "p-value"), 2),
+    "p-value interaction"
+  ), 2)
+)
+
+write.xlsx(predall$predsprint, paste0(
+  "./output/tabs/sens_Associations between SGLT2i use and characteristics in location subgroups_", Sys.Date(), ".xlsx"
+), rowNames = FALSE, overwrite = TRUE)
+
+
+levs <- levels(rsdata %>% pull(shf_location))
+
+default_kable(predall$predsprint,
+  font_size = 6,
+  caption = "Associations between SGLT2i use and characteristics in location subgroups - excluding patients with Type I diabetes, eGFR < 20 and dialysis",
+  escape = T
+) %>%
+  add_header_above(c(
+    " " = 1,
+    setNames(2, levs[1]), setNames(2, levs[2]), "",
+    setNames(2, levs[1]), setNames(2, levs[2]), ""
+  )) %>%
+  add_header_above(c(" " = 1, "Crude" = 5, "Adjusted" = 5))
+```
+
+\elandscape
+
+```{r sens-orforestlocationadj, cache=cacheon, dependson=c("ortabintfunc", "sens-ortablocation", "orforestintfunc"), fig.width=6, fig.height=10, fig.cap="Adjusted associations between SGLT2i use and characteristics in location subgroups - excluding patients with Type I diabetes, eGFR < 20 and dialysis"}
+
+predadj <- predall$preds %>%
+  select(Variable, contains("adj"))
+
+plotforest(forestdata = predadj, levs = levs, add1 = 5.5)
+```
+
+\blandscape
+
+```{r sens-ortabdurhf, dependson="ortabintfunc", cache=cacheon}
+
+predall <- predfunc(
+  var = "shf_durationhf", 
+  impdata = imprsdata_subset
+)
+
+colnames(predall$predsprint) <- c(
+  "Variable",
+  rep(c(
+    rep(c("OR (95% CI)", "p-value"), 2),
+    "p-value interaction"
+  ), 2)
+)
+
+write.xlsx(predall$predsprint, paste0(
+  "./output/tabs/sens_Associations between SGLT2i use and characteristics in duration of HF subgroups_", Sys.Date(), ".xlsx"
+), rowNames = FALSE, overwrite = TRUE)
+
+
+levs <- levels(rsdata %>% pull(shf_durationhf))
+
+default_kable(predall$predsprint,
+  font_size = 6,
+  caption = "Associations between SGLT2i use and characteristics in duration of HF subgroups - excluding patients with Type I diabetes, eGFR < 20 and dialysis",
+  escape = T
+) %>%
+  add_header_above(c(
+    " " = 1,
+    setNames(2, levs[1]), setNames(2, levs[2]), "",
+    setNames(2, levs[1]), setNames(2, levs[2]), ""
+  )) %>%
+  add_header_above(c(" " = 1, "Crude" = 5, "Adjusted" = 5))
+```
+
+\elandscape
+
+```{r sens-orforestdurhfadj, cache=cacheon, dependson=c("ortabintfunc", "sens-ortabdurhf", "orforestintfunc"), fig.width=6, fig.height=10, fig.cap="Adjusted associations between SGLT2i use and characteristics in duration of HF subgroups - excluding patients with Type I diabetes, eGFR < 20 and dialysis"}
+
+predadj <- predall$preds %>%
+  select(Variable, contains("adj"))
+
+plotforest(forestdata = predadj, levs = levs, add1 = 3)
+```
+
+\blandscape
+
+```{r sens-ortabsex, dependson="ortabintfunc", cache=cacheon}
+
+predall <- predfunc(
+  var = "shf_sex", 
+  impdata = imprsdata_subset
+)
+
+colnames(predall$predsprint) <- c(
+  "Variable",
+  rep(c(
+    rep(c("OR (95% CI)", "p-value"), 2),
+    "p-value interaction"
+  ), 2)
+)
+
+write.xlsx(predall$predsprint, paste0(
+  "./output/tabs/sens_Associations between SGLT2i use and characteristics in sex subgroups_", Sys.Date(), ".xlsx"
+), rowNames = FALSE, overwrite = TRUE)
+
+
+levs <- levels(rsdata %>% pull(shf_sex))
+
+default_kable(predall$predsprint,
+  font_size = 6,
+  caption = "Associations between SGLT2i use and characteristics in sex subgroups - excluding patients with Type I diabetes, eGFR < 20 and dialysis",
+  escape = T
+) %>%
+  add_header_above(c(
+    " " = 1,
+    setNames(2, levs[1]), setNames(2, levs[2]), "",
+    setNames(2, levs[1]), setNames(2, levs[2]), ""
+  )) %>%
+  add_header_above(c(" " = 1, "Crude" = 5, "Adjusted" = 5))
+```
+
+\elandscape
+
+```{r sens-orforestsexadj, cache=cacheon, dependson=c("ortabintfunc", "sens-ortabsex", "orforestintfunc"), fig.width=6, fig.height=10, fig.cap="Adjusted associations between SGLT2i use and characteristics in sex subgroups - excluding patients with Type I diabetes, eGFR < 20 and dialysis"}
 
 predadj <- predall$preds %>%
   select(Variable, contains("adj"))

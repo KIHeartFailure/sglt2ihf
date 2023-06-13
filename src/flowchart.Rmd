@@ -13,9 +13,10 @@ grViz(paste0("digraph flowchart {
       tab8 [label = '@@8']
       tab9 [label = '@@9']
       tab10 [label = '@@10']
+      tab11 [label = '@@11']
 
       # edge definitions with the node IDs
-      tab1 -> tab2 -> tab3 -> tab4 -> tab5 -> tab6 -> tab7 -> tab8 -> tab9 -> tab10;
+      tab1 -> tab2 -> tab3 -> tab4 -> tab5 -> tab6 -> tab7 -> tab8 -> tab9 -> tab10 -> tab11;
       }
 
       [1]: '", flow[1, 1], "\\n n = ", flow[1, 2], "'
@@ -28,5 +29,6 @@ grViz(paste0("digraph flowchart {
       [8]: '", flow[8, 1], "\\n n = ", flow[8, 2], "'
       [9]: '", flow[9, 1], "\\n n = ", flow[9, 2], "'
       [10]: '", flow[10, 1], "\\n n = ", flow[10, 2], "'
+      [11]: '", flow[11, 1], "\\n n = ", flow[11, 2], "'
       "))
 ```

@@ -6,7 +6,7 @@
 
 ProjectTemplate::reload.project(
   reset = TRUE,
-  data_loading = TRUE,
+  data_loading = FALSE,
   munging = TRUE
 )
 
@@ -15,9 +15,11 @@ ProjectTemplate::cache("meta_variables")
 ProjectTemplate::cache("flow")
 ProjectTemplate::cache("rsdata")
 ProjectTemplate::cache("imprsdata")
+ProjectTemplate::cache("imprsdata_subset")
 
 ProjectTemplate::cache("metalm")
 ProjectTemplate::cache("overtime")
+ProjectTemplate::cache("overtime_subset")
 
 ProjectTemplate::cache("tabvars")
 ProjectTemplate::cache("modvars")

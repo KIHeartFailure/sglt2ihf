@@ -27,7 +27,7 @@ overtimefunc <- function(overtimedata = overtime, filtergroups, groupnames, year
     type = "b",
     pch = 19,
     lty = 1,
-    col = global_cols[4],
+    col = "#cc9900",
     lwd = 2,
     add = T
   )
@@ -46,7 +46,7 @@ overtimefunc <- function(overtimedata = overtime, filtergroups, groupnames, year
     "topleft",
     bty = "n",
     groupnames,
-    col = global_cols[c(2, 4, 6)],
+    col = c(global_cols[2], "#cc9900", global_cols[6]),
     cex = cexmy, lwd = 2, lty = 1
   )
   axis(1, overtimedata %>% filter(var == filtergroups[1]) %>% pull(count),
@@ -60,7 +60,7 @@ overtimefunc <- function(overtimedata = overtime, filtergroups, groupnames, year
 }
 ```
 
-```{r overtime, cache = cacheon, dependson="overtimefunc", fig.cap = "SGLT2i overtime - Alternative I", fig.show='hold', out.width="40%", fig.subcap=c('Overall and Substances', 'CKD', 'Diabetes (Type I excluded)', 'Previous HFH < 1 year', 'Sex'), fig.ncol=2}
+```{r overtime, cache = cacheon, dependson="overtimefunc", fig.cap = "SGLT2i overtime - Alternative I", fig.show='hold', out.width="33%", fig.subcap=c('Overall and Substances', 'CKD', 'Diabetes (Type I excluded)', 'Previous HFH < 1 year', 'Location', 'Duration of HF', 'Sex'), fig.ncol=3}
 
 overtimefunc(
   filtergroups = c("all", "dapa", "empa"),
@@ -79,6 +79,14 @@ overtimefunc(
   groupnames = c("Previous HFH <1 year", "No previous HFH <1 year")
 )
 overtimefunc(
+  filtergroups = c("inpat", "outpat"),
+  groupnames = c("In-patient", "Out-patient")
+)
+overtimefunc(
+  filtergroups = c("durhfmore", "durhfless"),
+  groupnames = c("Duration of HF >6 months", "Duration of HF <6 months")
+)
+overtimefunc(
   filtergroups = c("male", "female"),
   groupnames = c("Male", "Female")
 )
@@ -92,7 +100,60 @@ overtimetab <- overtime %>%
   select(var, yearsemester, den, num, percent)
 default_kable(overtimetab,
   scale_down = FALSE,
-  caption = "SGLT2i overtime (exact percent from Fig) - Alternative I"
+  caption = "SGLT2i overtime (exact percent from Fig) - Alternative I", 
+  longtable = T
+)
+```
+
+```{r sens-overtime, cache = cacheon, dependson="overtimefunc", fig.cap = "SGLT2i overtime - Alternative I - excluding patients with Type I diabetes, eGFR < 20 and dialysis", fig.show='hold', out.width="33%", fig.subcap=c('Overall and Substances', 'CKD', 'Diabetes (Type I excluded)', 'Previous HFH < 1 year', 'Location', 'Duration of HF', 'Sex'), fig.ncol=3}
+
+overtimefunc(
+  overtimedata = overtime_subset, 
+  filtergroups = c("all", "dapa", "empa"),
+  groupnames = c("SGLT2i", "Dapagliflozin", "Empagliflozin")
+)
+overtimefunc(
+  overtimedata = overtime_subset, 
+  filtergroups = c("ckd", "nockd"),
+  groupnames = c("eGFR <60", "eGFR \u226560")
+)
+overtimefunc(
+  overtimedata = overtime_subset, 
+  filtergroups = c("type2", "notype2"),
+  groupnames = c("Diabetes type II", "No diabetes")
+)
+overtimefunc(
+  overtimedata = overtime_subset, 
+  filtergroups = c("prevhfh", "noprevhfh"),
+  groupnames = c("Previous HFH <1 year", "No previous HFH <1 year")
+)
+overtimefunc(
+  overtimedata = overtime_subset, 
+  filtergroups = c("inpat", "outpat"),
+  groupnames = c("In-patient", "Out-patient")
+)
+overtimefunc(
+  overtimedata = overtime_subset, 
+  filtergroups = c("durhfmore", "durhfless"),
+  groupnames = c("Duration of HF >6 months", "Duration of HF <6 months")
+)
+overtimefunc(
+  overtimedata = overtime_subset, 
+  filtergroups = c("male", "female"),
+  groupnames = c("Male", "Female")
+)
+```
+
+\clearpage
+
+```{r sens-overtimetab}
+overtimetab <- overtime_subset %>%
+  mutate(percent = fn(percent, 1)) %>%
+  select(var, yearsemester, den, num, percent)
+default_kable(overtimetab,
+  scale_down = FALSE,
+  caption = "SGLT2i overtime (exact percent from Fig) - Alternative I - excluding patients with Type I diabetes, eGFR < 20 and dialysis", 
+  longtable = T
 )
 ```
 
@@ -143,6 +204,22 @@ overtimeprevhfh <- overtimefunccount(
   sglt2var = "sos_ddr_sglt2",
   rspop = rsdata %>% filter(!is.na(shf_sos_prevhfh) & shf_sos_prevhfh == "Previous HFH <1 year")
 )
+overtimeinpat <- overtimefunccount(
+  sglt2var = "sos_ddr_sglt2",
+  rspop = rsdata %>% filter(!is.na(shf_location) & shf_location == "In-patient")
+)
+overtimeoutpat <- overtimefunccount(
+  sglt2var = "sos_ddr_sglt2",
+  rspop = rsdata %>% filter(!is.na(shf_location) & shf_location == "Out-patient")
+)
+overtimedurhfmore <- overtimefunccount(
+  sglt2var = "sos_ddr_sglt2",
+  rspop = rsdata %>% filter(!is.na(shf_durationhf) & shf_durationhf == ">6mo")
+)
+overtimedurhfless <- overtimefunccount(
+  sglt2var = "sos_ddr_sglt2",
+  rspop = rsdata %>% filter(!is.na(shf_durationhf) & shf_durationhf == "<6mo")
+)
 overtimemale <- overtimefunccount(
   sglt2var = "sos_ddr_sglt2",
   rspop = rsdata %>% filter(shf_sex == "Male")
@@ -162,12 +239,88 @@ overtimeshf <- bind_rows(
   overtimetype2 %>% mutate(var = "type2"),
   overtimenoprevhfh %>% mutate(var = "noprevhfh"),
   overtimeprevhfh %>% mutate(var = "prevhfh"),
+  overtimeinpat %>% mutate(var = "inpat"),
+  overtimeoutpat %>% mutate(var = "outpat"),
+  overtimedurhfmore %>% mutate(var = "durhfmore"),
+  overtimedurhfless %>% mutate(var = "durhfless"),
+  overtimemale %>% mutate(var = "male"),
+  overtimefemale %>% mutate(var = "female")
+)
+
+
+overtimeall <- overtimefunccount(sglt2var = "sos_ddr_sglt2", rspop = rsdata %>% filter(subset))
+overtimedapa <- overtimefunccount(sglt2var = "sos_ddr_sglt2_Dapagliflozin", rspop = rsdata %>% filter(subset))
+overtimeempa <- overtimefunccount(sglt2var = "sos_ddr_sglt2_Empagliflozin", rspop = rsdata %>% filter(subset))
+
+overtimenockd <- overtimefunccount(
+  sglt2var = "sos_ddr_sglt2",
+  rspop = rsdata %>% filter(!is.na(shf_gfrckdepi_cat) & shf_gfrckdepi_cat == ">=60" & subset)
+)
+overtimeckd <- overtimefunccount(
+  sglt2var = "sos_ddr_sglt2",
+  rspop = rsdata %>% filter(!is.na(shf_gfrckdepi_cat) & shf_gfrckdepi_cat == "<60" & subset)
+)
+overtimenotype2 <- overtimefunccount(
+  sglt2var = "sos_ddr_sglt2",
+  rspop = rsdata %>% filter(!is.na(shf_sos_com_diabetestype) & shf_sos_com_diabetestype == "No" & subset)
+)
+overtimetype2 <- overtimefunccount(
+  sglt2var = "sos_ddr_sglt2",
+  rspop = rsdata %>% filter(!is.na(shf_sos_com_diabetestype) & shf_sos_com_diabetestype == "Type II" & subset)
+)
+overtimenoprevhfh <- overtimefunccount(
+  sglt2var = "sos_ddr_sglt2",
+  rspop = rsdata %>% filter(!is.na(shf_sos_prevhfh) & shf_sos_prevhfh == "No previous HFH <1 year" & subset)
+)
+overtimeprevhfh <- overtimefunccount(
+  sglt2var = "sos_ddr_sglt2",
+  rspop = rsdata %>% filter(!is.na(shf_sos_prevhfh) & shf_sos_prevhfh == "Previous HFH <1 year" & subset)
+)
+overtimeinpat <- overtimefunccount(
+  sglt2var = "sos_ddr_sglt2",
+  rspop = rsdata %>% filter(!is.na(shf_location) & shf_location == "In-patient" & subset)
+)
+overtimeoutpat <- overtimefunccount(
+  sglt2var = "sos_ddr_sglt2",
+  rspop = rsdata %>% filter(!is.na(shf_location) & shf_location == "Out-patient" & subset)
+)
+overtimedurhfmore <- overtimefunccount(
+  sglt2var = "sos_ddr_sglt2",
+  rspop = rsdata %>% filter(!is.na(shf_durationhf) & shf_durationhf == ">6mo" & subset)
+)
+overtimedurhfless <- overtimefunccount(
+  sglt2var = "sos_ddr_sglt2",
+  rspop = rsdata %>% filter(!is.na(shf_durationhf) & shf_durationhf == "<6mo" & subset)
+)
+overtimemale <- overtimefunccount(
+  sglt2var = "sos_ddr_sglt2",
+  rspop = rsdata %>% filter(shf_sex == "Male" & subset)
+)
+overtimefemale <- overtimefunccount(
+  sglt2var = "sos_ddr_sglt2",
+  rspop = rsdata %>% filter(shf_sex == "Female" & subset)
+)
+
+overtimeshf_subset <- bind_rows(
+  overtimeall %>% mutate(var = "all"),
+  overtimedapa %>% mutate(var = "dapa"),
+  overtimeempa %>% mutate(var = "empa"),
+  overtimenockd %>% mutate(var = "nockd"),
+  overtimeckd %>% mutate(var = "ckd"),
+  overtimenotype2 %>% mutate(var = "notype2"),
+  overtimetype2 %>% mutate(var = "type2"),
+  overtimenoprevhfh %>% mutate(var = "noprevhfh"),
+  overtimeprevhfh %>% mutate(var = "prevhfh"),
+  overtimeinpat %>% mutate(var = "inpat"),
+  overtimeoutpat %>% mutate(var = "outpat"),
+  overtimedurhfmore %>% mutate(var = "durhfmore"),
+  overtimedurhfless %>% mutate(var = "durhfless"),
   overtimemale %>% mutate(var = "male"),
   overtimefemale %>% mutate(var = "female")
 )
 ```
 
-```{r overtime2, cache = cacheon, dependson=c("overtimefunc", "overtimefunc2"), fig.cap = "SGLT2i overtime - Alternative II", fig.show='hold', out.width="40%", fig.subcap=c('Overall and Substances', 'CKD', 'Diabetes (Type I excluded)', 'Previous HFH < 1 year', 'Sex'), fig.ncol=2}
+```{r overtime2, cache = cacheon, dependson=c("overtimefunc", "overtimefunc2"), fig.cap = "SGLT2i overtime - Alternative II", fig.show='hold', out.width="33%", fig.subcap=c('Overall and Substances', 'CKD', 'Diabetes (Type I excluded)', 'Previous HFH < 1 year', 'Location', 'Duration of HF', 'Sex'), fig.ncol=3}
 
 overtimefunc(
   overtimedata = overtimeshf,
@@ -195,6 +348,18 @@ overtimefunc(
 )
 overtimefunc(
   overtimedata = overtimeshf,
+  filtergroups = c("inpat", "outpat"),
+  groupnames = c("In-patient", "Out-patient"),
+  yearvar = "shf_indexyearquarter", yearvarname = "Year:Quarter"
+)
+overtimefunc(
+  overtimedata = overtimeshf,
+  filtergroups = c("durhfmore", "durhfless"),
+  groupnames = c("Duration of HF >6 months", "Duration of HF <6 months"),
+  yearvar = "shf_indexyearquarter", yearvarname = "Year:Quarter"
+)
+overtimefunc(
+  overtimedata = overtimeshf,
   filtergroups = c("male", "female"),
   groupnames = c("Male", "Female"),
   yearvar = "shf_indexyearquarter", yearvarname = "Year:Quarter"
@@ -210,6 +375,65 @@ overtimetab <- overtimeshf %>%
 default_kable(overtimetab,
   scale_down = FALSE,
   caption = "SGLT2i overtime (exact percent from Fig) - Alternative II",
+  longtable = T
+)
+```
+
+```{r sens-overtime2, cache = cacheon, dependson=c("overtimefunc", "overtimefunc2"), fig.cap = "SGLT2i overtime - Alternative II - excluding patients with Type I diabetes, eGFR < 20 and dialysis", fig.show='hold', out.width="33%", fig.subcap=c('Overall and Substances', 'CKD', 'Diabetes (Type I excluded)', 'Previous HFH < 1 year', 'Location', 'Duration of HF', 'Sex'), fig.ncol=3}
+
+overtimefunc(
+  overtimedata = overtimeshf_subset,
+  filtergroups = c("all", "dapa", "empa"),
+  groupnames = c("SGLT2i", "Dapagliflozin", "Empagliflozin"),
+  yearvar = "shf_indexyearquarter", yearvarname = "Year:Quarter"
+)
+overtimefunc(
+  overtimedata = overtimeshf_subset,
+  filtergroups = c("ckd", "nockd"),
+  groupnames = c("eGFR <60", "eGFR \u226560"),
+  yearvar = "shf_indexyearquarter", yearvarname = "Year:Quarter"
+)
+overtimefunc(
+  overtimedata = overtimeshf_subset,
+  filtergroups = c("type2", "notype2"),
+  groupnames = c("Diabetes type II", "No diabetes"),
+  yearvar = "shf_indexyearquarter", yearvarname = "Year:Quarter"
+)
+overtimefunc(
+  overtimedata = overtimeshf_subset,
+  filtergroups = c("prevhfh", "noprevhfh"),
+  groupnames = c("Previous HFH <1 year", "No previous HFH <1 year"),
+  yearvar = "shf_indexyearquarter", yearvarname = "Year:Quarter"
+)
+overtimefunc(
+  overtimedata = overtimeshf_subset,
+  filtergroups = c("inpat", "outpat"),
+  groupnames = c("In-patient", "Out-patient"),
+  yearvar = "shf_indexyearquarter", yearvarname = "Year:Quarter"
+)
+overtimefunc(
+  overtimedata = overtimeshf_subset,
+  filtergroups = c("durhfmore", "durhfless"),
+  groupnames = c("Duration of HF >6 months", "Duration of HF <6 months"),
+  yearvar = "shf_indexyearquarter", yearvarname = "Year:Quarter"
+)
+overtimefunc(
+  overtimedata = overtimeshf_subset,
+  filtergroups = c("male", "female"),
+  groupnames = c("Male", "Female"),
+  yearvar = "shf_indexyearquarter", yearvarname = "Year:Quarter"
+)
+```
+
+\clearpage
+
+```{r sens-overtimetab2, cache = cacheon, dependson=c("overtimefunc2")}
+overtimetab <- overtimeshf_subset %>%
+  mutate(percent = fn(percent, 1)) %>%
+  select(var, shf_indexyearquarter, den, num, percent)
+default_kable(overtimetab,
+  scale_down = FALSE,
+  caption = "SGLT2i overtime (exact percent from Fig) - Alternative II - excluding patients with Type I diabetes, eGFR < 20 and dialysis",
   longtable = T
 )
 ```

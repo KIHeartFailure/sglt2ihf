@@ -55,3 +55,6 @@ datacheck <- mice::complete(imprsdata, 1)
 for (i in seq_along(modvars)) {
   if (any(is.na(datacheck[, modvars[i]]))) stop("Missing for imp vars")
 }
+
+
+imprsdata_subset <- miceadds::subset_datlist(imprsdata, expr_subset = rsdata$subset == TRUE)
