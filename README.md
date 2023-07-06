@@ -1,4 +1,4 @@
-# R code for the project Use of the inhibitors of sodium-glucose cotransporter 2 in patients with heart failure
+# R code for the project Real-world use of sodium–glucose co-transporter 2 inhibitors in patients with heart failure and reduced ejection fraction: Data from the Swedish Heart Failure Registry
 
 The aim of this R code is to be transparent and document the data handling 
 and statistical analyses performed for the project.
